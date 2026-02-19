@@ -243,9 +243,9 @@ function Hero() {
         {/* Mascot — blended into space with orbiting particles */}
         <div className="animate-fade-in-up flex justify-center mb-10">
           <div className="relative w-[240px] h-[240px] flex items-center justify-center">
-            {/* Star glow behind mascot */}
-            <div className="absolute inset-0 rounded-full bg-electric/[0.12] blur-[60px] scale-125 animate-pulse-glow" />
-            <div className="absolute inset-[10%] rounded-full bg-gold/[0.06] blur-[40px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+            {/* White starlight emanating from behind mascot */}
+            <div className="absolute inset-0 rounded-full bg-white/[0.06] blur-[80px] scale-150 animate-pulse-glow" />
+            <div className="absolute inset-[10%] rounded-full bg-white/[0.1] blur-[50px] scale-110 animate-pulse-glow" style={{ animationDelay: "1s" }} />
 
             {/* Orbit ring 1 — particles */}
             <div className="absolute inset-0 animate-orbit">
