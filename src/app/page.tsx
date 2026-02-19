@@ -240,28 +240,48 @@ function Hero() {
       <div className="absolute top-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-purple-dim/[0.06] blur-[100px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24">
-        {/* Mascot — blended into space */}
-        <div className="animate-fade-in-up flex justify-center mb-6">
-          <div className="relative w-[320px] h-[320px] flex items-center justify-center">
-            {/* Ambient glow — mimics nebula light behind mascot */}
-            <div className="absolute inset-0 rounded-full bg-electric/[0.07] blur-[100px] scale-150 animate-pulse-glow" />
-            <div className="absolute inset-[15%] rounded-full bg-gold/[0.04] blur-[70px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
-            <div className="absolute inset-[25%] rounded-full bg-purple/[0.03] blur-[50px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
+        {/* Mascot — blended into space with orbiting particles */}
+        <div className="animate-fade-in-up flex justify-center mb-10">
+          <div className="relative w-[240px] h-[240px] flex items-center justify-center">
+            {/* Star glow behind mascot */}
+            <div className="absolute inset-0 rounded-full bg-electric/[0.12] blur-[60px] scale-125 animate-pulse-glow" />
+            <div className="absolute inset-[10%] rounded-full bg-gold/[0.06] blur-[40px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
 
-            {/* Mascot image with soft radial fade — edges dissolve into space */}
+            {/* Orbit ring 1 — particles */}
+            <div className="absolute inset-0 animate-orbit">
+              <div className="relative w-full h-full">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-electric-bright shadow-[0_0_12px_rgba(56,189,248,0.8)]" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gold shadow-[0_0_10px_rgba(245,158,11,0.7)]" />
+              </div>
+            </div>
+
+            {/* Orbit ring 2 — particles */}
+            <div className="absolute inset-8 animate-orbit-reverse">
+              <div className="relative w-full h-full">
+                <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-gold-bright shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-purple shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+              </div>
+            </div>
+
+            {/* Mascot — tight mask so snail stays crisp, only dark corners fade */}
             <div className="relative z-10 animate-float">
               <Image
                 src="/mascot.png"
                 alt="Moltino Agent"
-                width={280}
-                height={280}
+                width={180}
+                height={180}
                 priority
                 style={{
-                  maskImage: "radial-gradient(circle, black 38%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 62%, transparent 72%)",
-                  WebkitMaskImage: "radial-gradient(circle, black 38%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 62%, transparent 72%)",
+                  maskImage: "radial-gradient(circle, black 55%, rgba(0,0,0,0.5) 68%, transparent 80%)",
+                  WebkitMaskImage: "radial-gradient(circle, black 55%, rgba(0,0,0,0.5) 68%, transparent 80%)",
                 }}
               />
             </div>
+
+            {/* Accent particles */}
+            <div className="absolute top-4 right-4 w-1 h-1 rounded-full bg-electric-bright/60 animate-pulse" />
+            <div className="absolute bottom-6 left-4 w-1 h-1 rounded-full bg-gold/50 animate-pulse" style={{ animationDelay: "1s" }} />
+            <div className="absolute top-10 left-2 w-0.5 h-0.5 rounded-full bg-purple/40 animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
         </div>
 
