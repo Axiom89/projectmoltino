@@ -209,12 +209,15 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border-subtle/50 backdrop-blur-xl bg-bg-primary/60">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="relative group">
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-electric via-purple to-gold opacity-50 blur-[6px] group-hover:opacity-90 transition-opacity" />
-            <div className="relative avatar-sphere w-[34px] h-[34px] ring-1 ring-white/10"
-              style={{ boxShadow: "inset 0 -4px 10px rgba(0,0,0,0.5), inset 0 2px 6px rgba(255,255,255,0.06)" }}>
-              <Image src="/mascot.png" alt="Moltino" width={34} height={34} className="w-full h-full object-cover" />
-            </div>
+          <div className="relative group w-[34px] h-[34px]">
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-electric via-purple to-gold opacity-40 blur-[6px] group-hover:opacity-80 transition-opacity" />
+            <Image src="/mascot.png" alt="Moltino" width={34} height={34}
+              className="relative w-full h-full"
+              style={{
+                maskImage: "radial-gradient(circle, black 40%, transparent 72%)",
+                WebkitMaskImage: "radial-gradient(circle, black 40%, transparent 72%)",
+              }}
+            />
           </div>
           <span className="text-lg font-bold tracking-tight">moltino</span>
         </div>
@@ -237,50 +240,28 @@ function Hero() {
       <div className="absolute top-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-purple-dim/[0.06] blur-[100px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24">
-        {/* Mascot with orbital rings */}
-        <div className="animate-fade-in-up flex justify-center mb-10">
-          <div className="relative w-[280px] h-[280px] flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-electric/15 blur-[60px] scale-125 animate-pulse-glow" />
+        {/* Mascot — blended into space */}
+        <div className="animate-fade-in-up flex justify-center mb-6">
+          <div className="relative w-[320px] h-[320px] flex items-center justify-center">
+            {/* Ambient glow — mimics nebula light behind mascot */}
+            <div className="absolute inset-0 rounded-full bg-electric/[0.07] blur-[100px] scale-150 animate-pulse-glow" />
+            <div className="absolute inset-[15%] rounded-full bg-gold/[0.04] blur-[70px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+            <div className="absolute inset-[25%] rounded-full bg-purple/[0.03] blur-[50px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
 
-            {/* Orbit ring 1 */}
-            <div className="absolute inset-2 animate-orbit">
-              <div className="relative w-full h-full">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-electric-bright shadow-[0_0_12px_rgba(56,189,248,0.8)]" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gold shadow-[0_0_10px_rgba(245,158,11,0.7)]" />
-              </div>
+            {/* Mascot image with soft radial fade — edges dissolve into space */}
+            <div className="relative z-10 animate-float">
+              <Image
+                src="/mascot.png"
+                alt="Moltino Agent"
+                width={280}
+                height={280}
+                priority
+                style={{
+                  maskImage: "radial-gradient(circle, black 38%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 62%, transparent 72%)",
+                  WebkitMaskImage: "radial-gradient(circle, black 38%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 62%, transparent 72%)",
+                }}
+              />
             </div>
-            <div className="absolute inset-2 rounded-full border border-dashed border-electric/10" />
-
-            {/* Orbit ring 2 */}
-            <div className="absolute inset-10 animate-orbit-reverse">
-              <div className="relative w-full h-full">
-                <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-gold-bright shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
-                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-purple shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
-              </div>
-            </div>
-            <div className="absolute inset-10 rounded-full border border-electric-dim/10" />
-
-            {/* Frame */}
-            <div className="absolute inset-[52px] rounded-full bg-gradient-to-br from-electric-dim/40 via-transparent to-gold/25 p-[2px]">
-              <div className="w-full h-full rounded-full bg-bg-primary" />
-            </div>
-
-            {/* Mascot */}
-            <div className="relative z-10 animate-float"
-              style={{ filter: "drop-shadow(0 0 30px rgba(14,165,233,0.3)) drop-shadow(0 0 60px rgba(245,158,11,0.12))" }}>
-              <div className="avatar-sphere w-[156px] h-[156px] ring-2 ring-white/[0.06]"
-                style={{ boxShadow: "inset 0 -12px 30px rgba(0,0,0,0.55), inset 0 6px 16px rgba(255,255,255,0.07), 0 0 50px rgba(14,165,233,0.12)" }}>
-                <Image src="/mascot.png" alt="Moltino Agent" width={156} height={156} priority
-                  className="w-full h-full object-cover" />
-                {/* Specular highlight */}
-                <div className="absolute top-[6%] left-[15%] w-[35%] h-[18%] rounded-full pointer-events-none z-10"
-                  style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, transparent 100%)", filter: "blur(4px)" }} />
-              </div>
-            </div>
-
-            <div className="absolute top-6 right-6 w-1 h-1 rounded-full bg-electric-bright/60 animate-pulse" />
-            <div className="absolute bottom-8 left-5 w-1 h-1 rounded-full bg-gold/50 animate-pulse" style={{ animationDelay: "1s" }} />
-            <div className="absolute top-12 left-3 w-0.5 h-0.5 rounded-full bg-purple/40 animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
         </div>
 
@@ -462,12 +443,15 @@ function TechStack() {
         {/* Agent ID card */}
         <div className="mt-12 max-w-md mx-auto border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-electric-dim via-electric to-gold opacity-50 blur-[5px] animate-pulse-glow" />
-              <div className="relative avatar-sphere w-[44px] h-[44px] ring-1 ring-white/10"
-                style={{ boxShadow: "inset 0 -5px 14px rgba(0,0,0,0.5), inset 0 3px 8px rgba(255,255,255,0.06)" }}>
-                <Image src="/mascot.png" alt="Moltino" width={44} height={44} className="w-full h-full object-cover" />
-              </div>
+            <div className="relative w-[44px] h-[44px]">
+              <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-electric-dim via-electric to-gold opacity-40 blur-[5px] animate-pulse-glow" />
+              <Image src="/mascot.png" alt="Moltino" width={44} height={44}
+                className="relative w-full h-full"
+                style={{
+                  maskImage: "radial-gradient(circle, black 36%, transparent 68%)",
+                  WebkitMaskImage: "radial-gradient(circle, black 36%, transparent 68%)",
+                }}
+              />
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-electric border-2 border-bg-card animate-pulse" />
             </div>
             <div>
@@ -509,12 +493,15 @@ function Footer() {
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border-subtle/30">
           <div className="flex items-center gap-2.5">
-            <div className="relative">
-              <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-electric to-gold opacity-40 blur-[3px]" />
-              <div className="relative avatar-sphere w-[24px] h-[24px] ring-1 ring-white/10"
-                style={{ boxShadow: "inset 0 -3px 8px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.05)" }}>
-                <Image src="/mascot.png" alt="Moltino" width={24} height={24} className="w-full h-full object-cover" />
-              </div>
+            <div className="relative w-[24px] h-[24px]">
+              <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-electric to-gold opacity-35 blur-[3px]" />
+              <Image src="/mascot.png" alt="Moltino" width={24} height={24}
+                className="relative w-full h-full"
+                style={{
+                  maskImage: "radial-gradient(circle, black 34%, transparent 66%)",
+                  WebkitMaskImage: "radial-gradient(circle, black 34%, transparent 66%)",
+                }}
+              />
             </div>
             <span className="text-text-muted text-sm">moltino.xyz</span>
           </div>

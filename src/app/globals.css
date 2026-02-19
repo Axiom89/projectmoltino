@@ -150,23 +150,6 @@
     opacity: 0.2;
   }
 
-  /* ── Spherical avatar ── */
-  .avatar-sphere {
-    border-radius: 9999px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .avatar-sphere::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.12) 0%, transparent 45%, rgba(0,0,0,0.4) 100%);
-    pointer-events: none;
-    z-index: 2;
-  }
-
   /* ── Keyframes ── */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
