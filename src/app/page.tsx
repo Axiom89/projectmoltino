@@ -180,11 +180,11 @@ function Hero() {
         </h1>
 
         <p className="animate-fade-in-up delay-300 text-xl sm:text-2xl text-text-secondary font-medium max-w-2xl mx-auto mb-4 leading-relaxed">
-          AI-Powered Blockchain EVM Agent
+          Your onchain EVM agent
         </p>
 
         <p className="animate-fade-in-up delay-400 text-base text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-          Autonomous smart contract creation, auditing, dApp development, and Web3 marketing — all through natural conversation.
+          Tell it what you need. It writes contracts, ships dApps, runs your socials, and handles Web3 marketing — just by talking to it.
         </p>
 
         {/* CTA buttons */}
@@ -255,30 +255,30 @@ function WhatItDoes() {
   const features = [
     {
       icon: <ContractIcon />,
-      title: "Smart Contract Creation & Auditing",
+      title: "Write & Audit Contracts",
       description:
-        "Deploy and audit Solidity contracts with AI-driven vulnerability detection. From ERC-20 tokens to complex DeFi protocols.",
+        "Spins up Solidity contracts, catches vulnerabilities before deployment, and patches what needs fixing. ERC-20s, DeFi protocols, whatever you're building.",
       tag: "Security",
     },
     {
       icon: <DappIcon />,
-      title: "dApp Development by Conversation",
+      title: "Ship dApps From a DM",
       description:
-        "Describe what you need in plain English. Moltino architects, builds, and deploys full decentralized applications tailored to your vision.",
-      tag: "Development",
+        "Describe what you want in plain language. Moltino handles the architecture, the code, and the deployment. You just approve and ship.",
+      tag: "Build",
     },
     {
       icon: <MarketingIcon />,
-      title: "Web3 Product Marketing",
+      title: "Market to Onchain Audiences",
       description:
-        "Position your onchain product to resonate with crypto-native audiences and onchain speculators. Strategy, content, and execution.",
+        "Get your product in front of the right people. Moltino builds narratives, creates content, and runs campaigns that resonate with crypto-native users.",
       tag: "Growth",
     },
     {
       icon: <SocialIcon />,
-      title: "Web3 Social Management",
+      title: "Run Your Web3 Socials",
       description:
-        "Automate and optimize your project's social presence across crypto Twitter, Farcaster, and onchain social protocols.",
+        "Keeps your project active across CT, Farcaster, and onchain social — consistent posting, engagement, community presence without the grind.",
       tag: "Social",
     },
   ];
@@ -288,13 +288,13 @@ function WhatItDoes() {
       <div ref={ref} className="max-w-6xl mx-auto opacity-0">
         <div className="text-center mb-16">
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-3">
-            Capabilities
+            What it does
           </p>
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            What Moltino does
+            One agent, end-to-end
           </h2>
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            One agent. Full-stack Web3 execution. From contract to community.
+            From writing contracts to running your socials — Moltino handles the full stack so you can focus on the vision.
           </p>
         </div>
 
@@ -336,30 +336,30 @@ function HowItWorks() {
   const steps = [
     {
       num: "01",
-      title: "Start a conversation",
+      title: "DM Moltino on X",
       description:
-        "Reach out to Moltino on Twitter (X). Tell it what you need — a smart contract, a dApp, a marketing strategy, anything Web3.",
+        "Send a message. Tell it what you need — a contract, a dApp, a marketing push, help with socials. No forms, no onboarding. Just talk.",
       accent: "from-accent-dim to-accent",
     },
     {
       num: "02",
-      title: "Moltino collects info & scopes your request",
+      title: "It scopes the work with you",
       description:
-        "The agent asks clarifying questions, understands your requirements, and simulates costs for the work involved.",
+        "Moltino asks the right questions, figures out what you actually need, and gives you a cost estimate before anything starts.",
       accent: "from-accent to-accent-bright",
     },
     {
       num: "03",
-      title: "Upfront payment via x402",
+      title: "Pay onchain via x402",
       description:
-        "Pay seamlessly using the x402 payment protocol — purpose-built for onchain agent-to-human transactions. Transparent, verifiable, instant.",
+        "One upfront payment through x402 — a payment protocol made for agent transactions. Everything's onchain, verifiable, no middlemen.",
       accent: "from-accent-bright to-green-glow",
     },
     {
       num: "04",
-      title: "Preview, approve, or refund",
+      title: "Review it, ship it, or get a refund",
       description:
-        "Moltino delivers a preview of the work. Happy? Ship it. Not satisfied? Request a full refund. Zero risk.",
+        "Moltino sends you a preview. If you like it, it goes live. If not, ask for a full refund. That simple.",
       accent: "from-green-glow to-emerald-300",
     },
   ];
@@ -372,13 +372,13 @@ function HowItWorks() {
       <div ref={ref} className="relative max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-16">
           <p className="text-green-glow text-sm font-semibold tracking-widest uppercase mb-3">
-            Process
+            How it works
           </p>
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            How it works
+            DM to deploy
           </h2>
           <p className="text-text-secondary text-lg max-w-xl mx-auto">
-            From first message to delivered product — in four steps.
+            Four steps. No dashboards, no signups, no waitlists.
           </p>
         </div>
 
@@ -443,15 +443,15 @@ function TechStack() {
       <div ref={ref} className="max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-12">
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-3">
-            Infrastructure
+            Under the hood
           </p>
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            Built with
+            Onchain-native stack
           </h2>
           <p className="text-text-secondary text-lg max-w-xl mx-auto">
             Registered on Base as an{" "}
             <span className="text-accent-bright font-medium">ERC-8004</span>{" "}
-            agent — track its reputation onchain.
+            agent. Reputation is onchain — fully transparent, fully verifiable.
           </p>
         </div>
 
@@ -532,11 +532,11 @@ function Footer() {
         {/* CTA banner */}
         <div className="text-center mb-16">
           <h3 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Built for the{" "}
-            <span className="text-gradient">agentic economy</span>
+            Made for the{" "}
+            <span className="text-gradient">onchain future</span>
           </h3>
           <p className="text-text-secondary text-lg max-w-lg mx-auto mb-8">
-            The future of Web3 is autonomous. Moltino is the agent that gets you there.
+            Agents that ship real work, get paid onchain, and build reputation over time. That's the bet.
           </p>
           <a
             href="https://x.com/projectmoltino"
@@ -568,7 +568,7 @@ function Footer() {
           </div>
 
           <p className="text-text-muted text-sm">
-            Shipping the agentic future, one contract at a time.
+            Slow and steady ships the contract.
           </p>
         </div>
       </div>

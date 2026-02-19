@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Moltino — AI-Powered Blockchain EVM Agent",
+  title: "Moltino — Your Onchain EVM Agent",
   description:
-    "Autonomous AI agent for smart contract creation, auditing, dApp development, and Web3 marketing. Built for the agentic economy.",
+    "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
   openGraph: {
-    title: "Moltino — AI-Powered Blockchain EVM Agent",
+    title: "Moltino — Your Onchain EVM Agent",
     description:
-      "Autonomous AI agent for smart contract creation, auditing, dApp development, and Web3 marketing.",
+      "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
     url: "https://moltino.xyz",
     siteName: "Moltino",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Moltino — AI-Powered Blockchain EVM Agent",
+    title: "Moltino — Your Onchain EVM Agent",
     description:
-      "Autonomous AI agent for smart contract creation, auditing, dApp development, and Web3 marketing.",
+      "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
   },
 };
 
