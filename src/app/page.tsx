@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 /* ───────────────────── Intersection Observer Hook ───────────────────── */
 function useReveal() {
@@ -26,6 +26,139 @@ function useReveal() {
   }, []);
 
   return ref;
+}
+
+/* ──────────────────── Particle Canvas Background ────────────────────── */
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const animate = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = document.body.scrollHeight * dpr;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = document.body.scrollHeight + "px";
+    ctx.scale(dpr, dpr);
+
+    const w = window.innerWidth;
+    const h = document.body.scrollHeight;
+    const particleCount = Math.floor((w * h) / 18000);
+
+    interface Particle {
+      x: number;
+      y: number;
+      r: number;
+      dx: number;
+      dy: number;
+      opacity: number;
+      color: string;
+    }
+
+    const particles: Particle[] = [];
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.3,
+        dx: (Math.random() - 0.5) * 0.15,
+        dy: (Math.random() - 0.5) * 0.1,
+        opacity: Math.random() * 0.4 + 0.05,
+        color: Math.random() > 0.6 ? "#a78bfa" : Math.random() > 0.5 ? "#34d399" : "#71717a",
+      });
+    }
+
+    let frameId: number;
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+        ctx.fill();
+      }
+
+      // Draw faint connections between nearby particles
+      ctx.globalAlpha = 0.03;
+      ctx.strokeStyle = "#a78bfa";
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = dx * dx + dy * dy;
+          if (dist < 8000) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      frameId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  useEffect(() => {
+    const cleanup = animate();
+
+    const handleResize = () => {
+      if (cleanup) cleanup();
+      animate();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      if (cleanup) cleanup();
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [animate]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ opacity: 0.6 }}
+    />
+  );
+}
+
+/* ──────────────────── Aurora Blob Background ────────────────────────── */
+function AuroraBlobs() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {/* Top-left purple blob */}
+      <div className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] rounded-full bg-accent-dim/[0.04] blur-[100px] animate-aurora-1" />
+      {/* Center-right green blob */}
+      <div className="absolute top-[30%] -right-[5%] w-[500px] h-[500px] rounded-full bg-green-glow/[0.03] blur-[120px] animate-aurora-2" />
+      {/* Bottom-center mixed blob */}
+      <div className="absolute top-[60%] left-[20%] w-[700px] h-[400px] rounded-full bg-accent/[0.025] blur-[130px] animate-aurora-3" />
+      {/* Bottom-right accent */}
+      <div className="absolute top-[80%] right-[10%] w-[400px] h-[400px] rounded-full bg-accent-dim/[0.03] blur-[100px] animate-aurora-1" style={{ animationDelay: "10s" }} />
+    </div>
+  );
+}
+
+/* ──────────────────── Section Divider ───────────────────────────────── */
+function Divider() {
+  return <div className="section-divider mx-auto max-w-4xl" />;
 }
 
 /* ───────────────────────────── Icons ────────────────────────────────── */
@@ -111,10 +244,12 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden grid-bg noise-bg">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden grid-bg noise-bg scanline-overlay">
       {/* Ambient glow orbs */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-accent-dim/10 blur-[120px] animate-pulse-glow" />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-green-glow/8 blur-[100px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      {/* Extra: top-right warm glow */}
+      <div className="absolute top-10 right-[10%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.04] blur-[80px] animate-aurora-2" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24">
         {/* Mascot with orbital rings */}
@@ -567,8 +702,8 @@ function Footer() {
             </span>
           </div>
 
-          <p className="text-text-muted text-sm">
-            Slow and steady ships the contract.
+          <p className="text-text-muted text-sm font-mono">
+            agents &gt; dashboards
           </p>
         </div>
       </div>
@@ -580,11 +715,18 @@ function Footer() {
 export default function Home() {
   return (
     <>
+      {/* Global background effects */}
+      <ParticleField />
+      <AuroraBlobs />
+
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <Hero />
+        <Divider />
         <WhatItDoes />
+        <Divider />
         <HowItWorks />
+        <Divider />
         <TechStack />
       </main>
       <Footer />
