@@ -6,25 +6,16 @@ import { useEffect, useRef, useCallback } from "react";
 /* ───────────────────── Intersection Observer Hook ───────────────────── */
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("animate-fade-in-up");
-          observer.unobserve(el);
-        }
-      },
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { el.classList.add("animate-fade-in-up"); obs.unobserve(el); } },
       { threshold: 0.15 }
     );
-
-    observer.observe(el);
-    return () => observer.disconnect();
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
-
   return ref;
 }
 
@@ -48,31 +39,31 @@ function Starfield() {
     ctx.scale(dpr, dpr);
 
     interface Star {
-      x: number;
-      y: number;
-      r: number;
-      baseOpacity: number;
-      twinkleSpeed: number;
-      twinkleOffset: number;
+      x: number; y: number; r: number;
+      baseOpacity: number; twinkleSpeed: number; twinkleOffset: number;
       color: string;
     }
 
     const stars: Star[] = [];
-    const count = Math.floor((w * h) / 3000);
+    const count = Math.floor((w * h) / 2500);
 
     for (let i = 0; i < count; i++) {
-      const isBright = Math.random() > 0.92;
-      const isAccent = Math.random() > 0.85;
+      const isBright = Math.random() > 0.9;
+      const rng = Math.random();
+      let color = "#ffffff";
+      if (rng > 0.82) color = "#38bdf8";       // electric blue
+      else if (rng > 0.74) color = "#fbbf24";   // gold
+      else if (rng > 0.68) color = "#a78bfa";   // purple
+      else if (rng > 0.64) color = "#0ea5e9";   // deeper blue
+
       stars.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: isBright ? Math.random() * 2 + 1 : Math.random() * 1.2 + 0.2,
-        baseOpacity: isBright ? Math.random() * 0.6 + 0.4 : Math.random() * 0.35 + 0.05,
-        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        r: isBright ? Math.random() * 2.2 + 1 : Math.random() * 1.2 + 0.2,
+        baseOpacity: isBright ? Math.random() * 0.7 + 0.3 : Math.random() * 0.3 + 0.05,
+        twinkleSpeed: Math.random() * 0.025 + 0.005,
         twinkleOffset: Math.random() * Math.PI * 2,
-        color: isAccent
-          ? Math.random() > 0.5 ? "#a78bfa" : "#34d399"
-          : "#ffffff",
+        color,
       });
     }
 
@@ -85,7 +76,7 @@ function Starfield() {
 
       for (const s of stars) {
         const twinkle = Math.sin(time * s.twinkleSpeed + s.twinkleOffset);
-        const opacity = s.baseOpacity + twinkle * 0.2;
+        const opacity = s.baseOpacity + twinkle * 0.25;
 
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
@@ -93,12 +84,11 @@ function Starfield() {
         ctx.globalAlpha = Math.max(0.02, Math.min(1, opacity));
         ctx.fill();
 
-        // Glow for brighter stars
-        if (s.r > 1.2) {
+        if (s.r > 1.3) {
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          ctx.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
           ctx.fillStyle = s.color;
-          ctx.globalAlpha = Math.max(0, opacity * 0.08);
+          ctx.globalAlpha = Math.max(0, opacity * 0.1);
           ctx.fill();
         }
       }
@@ -113,71 +103,47 @@ function Starfield() {
 
   useEffect(() => {
     const cleanup = init();
-    const handleResize = () => {
-      if (cleanup) cleanup();
-      init();
-    };
+    const handleResize = () => { if (cleanup) cleanup(); init(); };
     window.addEventListener("resize", handleResize);
-    return () => {
-      if (cleanup) cleanup();
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => { if (cleanup) cleanup(); window.removeEventListener("resize", handleResize); };
   }, [init]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
-  );
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />;
 }
 
-/* ──────────────────── Nebula / Aurora Background ────────────────────── */
+/* ──────────────────── Nebula Background ─────────────────────────────── */
 function NebulaBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-      {/* Deep purple nebula — top */}
+      {/* Electric blue nebula — top center */}
       <div
-        className="absolute -top-[15%] -left-[10%] w-[800px] h-[600px] rounded-full animate-aurora-1"
-        style={{
-          background: "radial-gradient(ellipse, rgba(124,58,237,0.06) 0%, rgba(124,58,237,0.02) 40%, transparent 70%)",
-          filter: "blur(80px)",
-        }}
+        className="absolute -top-[10%] left-[20%] w-[800px] h-[600px] rounded-full animate-aurora-1"
+        style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)", filter: "blur(80px)" }}
       />
-      {/* Green nebula — right side */}
+      {/* Gold nebula — right */}
       <div
-        className="absolute top-[25%] -right-[8%] w-[600px] h-[500px] rounded-full animate-aurora-2"
-        style={{
-          background: "radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, rgba(52,211,153,0.015) 40%, transparent 70%)",
-          filter: "blur(100px)",
-        }}
+        className="absolute top-[15%] -right-[5%] w-[500px] h-[500px] rounded-full animate-aurora-2"
+        style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, rgba(251,191,36,0.015) 40%, transparent 70%)", filter: "blur(100px)" }}
       />
-      {/* Purple haze — mid page */}
+      {/* Deep purple — left side */}
       <div
-        className="absolute top-[50%] left-[15%] w-[700px] h-[500px] rounded-full animate-aurora-3"
-        style={{
-          background: "radial-gradient(ellipse, rgba(167,139,250,0.04) 0%, transparent 60%)",
-          filter: "blur(110px)",
-        }}
+        className="absolute top-[35%] -left-[8%] w-[600px] h-[500px] rounded-full animate-aurora-3"
+        style={{ background: "radial-gradient(ellipse, rgba(109,40,217,0.07) 0%, rgba(139,92,246,0.02) 40%, transparent 70%)", filter: "blur(90px)" }}
       />
-      {/* Warm nebula — bottom */}
+      {/* Blue-gold mix — mid page */}
       <div
-        className="absolute top-[70%] right-[15%] w-[500px] h-[500px] rounded-full animate-aurora-1"
-        style={{
-          background: "radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, rgba(52,211,153,0.02) 50%, transparent 70%)",
-          filter: "blur(90px)",
-          animationDelay: "12s",
-        }}
+        className="absolute top-[55%] right-[15%] w-[700px] h-[500px] rounded-full animate-aurora-1"
+        style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.05) 0%, rgba(245,158,11,0.03) 50%, transparent 70%)", filter: "blur(110px)", animationDelay: "12s" }}
       />
-      {/* Bottom-left accent */}
+      {/* Purple haze — bottom */}
       <div
-        className="absolute top-[85%] -left-[5%] w-[400px] h-[300px] rounded-full animate-aurora-2"
-        style={{
-          background: "radial-gradient(ellipse, rgba(52,211,153,0.04) 0%, transparent 60%)",
-          filter: "blur(80px)",
-          animationDelay: "8s",
-        }}
+        className="absolute top-[75%] left-[10%] w-[500px] h-[400px] rounded-full animate-aurora-2"
+        style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.06) 0%, transparent 60%)", filter: "blur(90px)", animationDelay: "8s" }}
+      />
+      {/* Gold dust — bottom right */}
+      <div
+        className="absolute top-[85%] right-[5%] w-[400px] h-[300px] rounded-full animate-aurora-3"
+        style={{ background: "radial-gradient(ellipse, rgba(251,191,36,0.05) 0%, transparent 60%)", filter: "blur(80px)", animationDelay: "15s" }}
       />
     </div>
   );
@@ -244,23 +210,13 @@ function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="relative group">
-            <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-accent via-accent-dim to-green-glow opacity-60 blur-[3px] group-hover:opacity-100 transition-opacity" />
-            <Image
-              src="/mascot.png"
-              alt="Moltino"
-              width={34}
-              height={34}
-              className="relative rounded-lg ring-1 ring-white/10"
-            />
+            <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-electric via-purple to-gold opacity-60 blur-[3px] group-hover:opacity-100 transition-opacity" />
+            <Image src="/mascot.png" alt="Moltino" width={34} height={34} className="relative rounded-lg ring-1 ring-white/10" />
           </div>
           <span className="text-lg font-bold tracking-tight">moltino</span>
         </div>
-        <a
-          href="https://x.com/projectmoltino"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-white/5"
-        >
+        <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-white/5">
           <XIcon />
           Follow
         </a>
@@ -272,67 +228,58 @@ function Navbar() {
 function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden scanline-overlay">
-      {/* Hero-specific extra glow */}
-      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] rounded-full bg-accent-dim/[0.07] blur-[150px] animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-green-glow/[0.05] blur-[120px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      {/* Hero glows */}
+      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] rounded-full bg-electric-dim/[0.08] blur-[150px] animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-gold/[0.05] blur-[120px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      <div className="absolute top-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-purple-dim/[0.06] blur-[100px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24">
         {/* Mascot with orbital rings */}
         <div className="animate-fade-in-up flex justify-center mb-10">
           <div className="relative w-[280px] h-[280px] flex items-center justify-center">
-            {/* Outer glow pulse */}
-            <div className="absolute inset-0 rounded-full bg-accent/15 blur-[60px] scale-125 animate-pulse-glow" />
+            <div className="absolute inset-0 rounded-full bg-electric/15 blur-[60px] scale-125 animate-pulse-glow" />
 
             {/* Orbit ring 1 */}
             <div className="absolute inset-2 animate-orbit">
               <div className="relative w-full h-full">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-accent-bright shadow-[0_0_12px_rgba(196,181,253,0.8)]" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-glow shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-electric-bright shadow-[0_0_12px_rgba(56,189,248,0.8)]" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gold shadow-[0_0_10px_rgba(245,158,11,0.7)]" />
               </div>
             </div>
-            <div className="absolute inset-2 rounded-full border border-dashed border-accent/10" />
+            <div className="absolute inset-2 rounded-full border border-dashed border-electric/10" />
 
             {/* Orbit ring 2 */}
             <div className="absolute inset-10 animate-orbit-reverse">
               <div className="relative w-full h-full">
-                <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-glow shadow-[0_0_10px_rgba(52,211,153,0.6)]" />
-                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(167,139,250,0.6)]" />
+                <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-gold-bright shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-purple shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
               </div>
             </div>
-            <div className="absolute inset-10 rounded-full border border-accent-dim/10" />
+            <div className="absolute inset-10 rounded-full border border-electric-dim/10" />
 
-            {/* Frame behind image */}
-            <div className="absolute inset-[52px] rounded-[28px] bg-gradient-to-br from-accent-dim/30 via-transparent to-green-glow/20 p-[1.5px]">
+            {/* Frame */}
+            <div className="absolute inset-[52px] rounded-[28px] bg-gradient-to-br from-electric-dim/30 via-transparent to-gold/20 p-[1.5px]">
               <div className="w-full h-full rounded-[27px] bg-bg-primary" />
             </div>
 
             {/* Mascot */}
-            <Image
-              src="/mascot.png"
-              alt="Moltino Agent"
-              width={156}
-              height={156}
-              priority
+            <Image src="/mascot.png" alt="Moltino Agent" width={156} height={156} priority
               className="relative z-10 rounded-[24px] animate-float"
-              style={{
-                filter: "drop-shadow(0 0 24px rgba(167,139,250,0.25)) drop-shadow(0 0 60px rgba(52,211,153,0.1))",
-              }}
+              style={{ filter: "drop-shadow(0 0 24px rgba(14,165,233,0.3)) drop-shadow(0 0 60px rgba(245,158,11,0.1))" }}
             />
 
-            {/* Accent dots */}
-            <div className="absolute top-6 right-6 w-1 h-1 rounded-full bg-accent-bright/60 animate-pulse" />
-            <div className="absolute bottom-8 left-5 w-1 h-1 rounded-full bg-green-glow/50 animate-pulse" style={{ animationDelay: "1s" }} />
-            <div className="absolute top-12 left-3 w-0.5 h-0.5 rounded-full bg-accent/40 animate-pulse" style={{ animationDelay: "2s" }} />
+            <div className="absolute top-6 right-6 w-1 h-1 rounded-full bg-electric-bright/60 animate-pulse" />
+            <div className="absolute bottom-8 left-5 w-1 h-1 rounded-full bg-gold/50 animate-pulse" style={{ animationDelay: "1s" }} />
+            <div className="absolute top-12 left-3 w-0.5 h-0.5 rounded-full bg-purple/40 animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
         </div>
 
         {/* Status badge */}
-        <div className="animate-fade-in-up delay-100 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-dim/30 bg-accent-dim/5 text-accent-bright text-sm font-medium mb-8 backdrop-blur-sm">
-          <span className="w-2 h-2 rounded-full bg-green-glow animate-pulse" />
+        <div className="animate-fade-in-up delay-100 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-electric-dim/30 bg-electric-dim/5 text-electric-bright text-sm font-medium mb-8 backdrop-blur-sm">
+          <span className="w-2 h-2 rounded-full bg-electric animate-pulse" />
           Building in public
         </div>
 
-        {/* Main heading */}
         <h1 className="animate-fade-in-up delay-200 text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter leading-none mb-6">
           <span className="text-gradient">Moltino</span>
         </h1>
@@ -347,57 +294,39 @@ function Hero() {
 
         {/* CTA buttons */}
         <div className="animate-fade-in-up delay-500 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="https://x.com/projectmoltino"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-accent-dim to-accent text-white font-semibold text-base transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_-8px_rgba(167,139,250,0.5)]"
-          >
+          <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
+            className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-electric-dim to-electric text-white font-semibold text-base transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_-8px_rgba(14,165,233,0.5)]">
             Request Early Access
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-              <line x1="7" y1="17" x2="17" y2="7" />
-              <polyline points="7 7 17 7 17 17" />
+              <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
             </svg>
           </a>
-          <a
-            href="#how-it-works"
-            className="px-8 py-3.5 rounded-xl border border-border-subtle text-text-secondary font-medium text-base hover:text-text-primary hover:border-text-muted transition-all duration-300 backdrop-blur-sm"
-          >
+          <a href="#how-it-works"
+            className="px-8 py-3.5 rounded-xl border border-border-subtle text-text-secondary font-medium text-base hover:text-text-primary hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
             See how it works
           </a>
         </div>
 
-        {/* Terminal preview */}
+        {/* Terminal */}
         <div className="animate-fade-in-up delay-700 mt-16 max-w-lg mx-auto">
           <div className="border-glow rounded-xl bg-bg-secondary/70 backdrop-blur-md p-5 text-left font-mono text-sm">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-              <div className="w-3 h-3 rounded-full bg-green-500/60" />
+              <div className="w-3 h-3 rounded-full bg-gold/60" />
+              <div className="w-3 h-3 rounded-full bg-electric/60" />
               <span className="ml-2 text-text-muted text-xs">moltino-agent</span>
             </div>
             <div className="space-y-2 text-text-secondary">
-              <p>
-                <span className="text-green-glow">$</span>{" "}
-                <span className="text-text-primary">@projectmoltino</span>{" "}
-                audit my ERC-20 token contract
-              </p>
-              <p className="text-accent-bright">
-                → Analyzing contract bytecode...
-              </p>
-              <p className="text-accent-bright">
-                → 3 vulnerabilities found. Generating fix...
-              </p>
-              <p className="text-green-glow">
-                ✓ Patched contract ready. Cost: 0.002 ETH
-              </p>
+              <p><span className="text-electric">$</span> <span className="text-text-primary">@projectmoltino</span> audit my ERC-20 token contract</p>
+              <p className="text-electric-bright">→ Analyzing contract bytecode...</p>
+              <p className="text-electric-bright">→ 3 vulnerabilities found. Generating fix...</p>
+              <p className="text-gold">✓ Patched contract ready. Cost: 0.002 ETH</p>
               <p className="text-text-muted animate-pulse">█</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
         <div className="w-6 h-10 rounded-full border-2 border-text-muted/30 flex items-start justify-center p-1.5">
           <div className="w-1.5 h-3 rounded-full bg-text-muted/50 animate-pulse" />
@@ -409,75 +338,34 @@ function Hero() {
 
 function WhatItDoes() {
   const ref = useReveal();
-
   const features = [
-    {
-      icon: <ContractIcon />,
-      title: "Write & Audit Contracts",
-      description:
-        "Spins up Solidity contracts, catches vulnerabilities before deployment, and patches what needs fixing. ERC-20s, DeFi protocols, whatever you're building.",
-      tag: "Security",
-    },
-    {
-      icon: <DappIcon />,
-      title: "Ship dApps From a DM",
-      description:
-        "Describe what you want in plain language. Moltino handles the architecture, the code, and the deployment. You just approve and ship.",
-      tag: "Build",
-    },
-    {
-      icon: <MarketingIcon />,
-      title: "Market to Onchain Audiences",
-      description:
-        "Get your product in front of the right people. Moltino builds narratives, creates content, and runs campaigns that resonate with crypto-native users.",
-      tag: "Growth",
-    },
-    {
-      icon: <SocialIcon />,
-      title: "Run Your Web3 Socials",
-      description:
-        "Keeps your project active across CT, Farcaster, and onchain social — consistent posting, engagement, community presence without the grind.",
-      tag: "Social",
-    },
+    { icon: <ContractIcon />, title: "Write & Audit Contracts", description: "Spins up Solidity contracts, catches vulnerabilities before deployment, and patches what needs fixing. ERC-20s, DeFi protocols, whatever you're building.", tag: "Security" },
+    { icon: <DappIcon />, title: "Ship dApps From a DM", description: "Describe what you want in plain language. Moltino handles the architecture, the code, and the deployment. You just approve and ship.", tag: "Build" },
+    { icon: <MarketingIcon />, title: "Market to Onchain Audiences", description: "Get your product in front of the right people. Moltino builds narratives, creates content, and runs campaigns that resonate with crypto-native users.", tag: "Growth" },
+    { icon: <SocialIcon />, title: "Run Your Web3 Socials", description: "Keeps your project active across CT, Farcaster, and onchain social — consistent posting, engagement, community presence without the grind.", tag: "Social" },
   ];
 
   return (
     <section className="relative py-32 px-6" id="features">
       <div ref={ref} className="max-w-6xl mx-auto opacity-0">
         <div className="text-center mb-16">
-          <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-3">
-            What it does
-          </p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            One agent, end-to-end
-          </h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            From writing contracts to running your socials — Moltino handles the full stack so you can focus on the vision.
-          </p>
+          <p className="text-electric text-sm font-semibold tracking-widest uppercase mb-3">What it does</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">One agent, end-to-end</h2>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">From writing contracts to running your socials — Moltino handles the full stack so you can focus on the vision.</p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((f, i) => (
-            <div
-              key={i}
-              className="group border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-8 hover:bg-bg-card/60 transition-all duration-500 hover:scale-[1.01]"
-            >
+            <div key={i} className="group border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-8 hover:bg-bg-card/60 transition-all duration-500 hover:scale-[1.01]">
               <div className="flex items-start gap-5">
-                <div className="shrink-0 w-14 h-14 rounded-xl bg-accent-dim/10 border border-accent-dim/20 flex items-center justify-center text-accent group-hover:text-accent-bright group-hover:border-accent-dim/40 transition-colors">
+                <div className="shrink-0 w-14 h-14 rounded-xl bg-electric-dim/10 border border-electric-dim/20 flex items-center justify-center text-electric group-hover:text-electric-bright group-hover:border-electric-dim/40 transition-colors">
                   {f.icon}
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-text-primary">
-                      {f.title}
-                    </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-accent-dim/10 text-accent font-medium">
-                      {f.tag}
-                    </span>
+                    <h3 className="text-lg font-semibold text-text-primary">{f.title}</h3>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-electric-dim/10 text-electric font-medium">{f.tag}</span>
                   </div>
-                  <p className="text-text-secondary leading-relaxed text-sm">
-                    {f.description}
-                  </p>
+                  <p className="text-text-secondary leading-relaxed text-sm">{f.description}</p>
                 </div>
               </div>
             </div>
@@ -490,73 +378,34 @@ function WhatItDoes() {
 
 function HowItWorks() {
   const ref = useReveal();
-
   const steps = [
-    {
-      num: "01",
-      title: "DM Moltino on X",
-      description:
-        "Send a message. Tell it what you need — a contract, a dApp, a marketing push, help with socials. No forms, no onboarding. Just talk.",
-      accent: "from-accent-dim to-accent",
-    },
-    {
-      num: "02",
-      title: "It scopes the work with you",
-      description:
-        "Moltino asks the right questions, figures out what you actually need, and gives you a cost estimate before anything starts.",
-      accent: "from-accent to-accent-bright",
-    },
-    {
-      num: "03",
-      title: "Pay onchain via x402",
-      description:
-        "One upfront payment through x402 — a payment protocol made for agent transactions. Everything's onchain, verifiable, no middlemen.",
-      accent: "from-accent-bright to-green-glow",
-    },
-    {
-      num: "04",
-      title: "Review it, ship it, or get a refund",
-      description:
-        "Moltino sends you a preview. If you like it, it goes live. If not, ask for a full refund. That simple.",
-      accent: "from-green-glow to-emerald-300",
-    },
+    { num: "01", title: "DM Moltino on X", description: "Send a message. Tell it what you need — a contract, a dApp, a marketing push, help with socials. No forms, no onboarding. Just talk.", accent: "from-electric-dim to-electric" },
+    { num: "02", title: "It scopes the work with you", description: "Moltino asks the right questions, figures out what you actually need, and gives you a cost estimate before anything starts.", accent: "from-electric to-purple" },
+    { num: "03", title: "Pay onchain via x402", description: "One upfront payment through x402 — a payment protocol made for agent transactions. Everything's onchain, verifiable, no middlemen.", accent: "from-purple to-gold" },
+    { num: "04", title: "Review it, ship it, or get a refund", description: "Moltino sends you a preview. If you like it, it goes live. If not, ask for a full refund. That simple.", accent: "from-gold to-gold-bright" },
   ];
 
   return (
     <section className="relative py-32 px-6" id="how-it-works">
       <div ref={ref} className="relative max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-16">
-          <p className="text-green-glow text-sm font-semibold tracking-widest uppercase mb-3">
-            How it works
-          </p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            DM to deploy
-          </h2>
-          <p className="text-text-secondary text-lg max-w-xl mx-auto">
-            Four steps. No dashboards, no signups, no waitlists.
-          </p>
+          <p className="text-gold text-sm font-semibold tracking-widest uppercase mb-3">How it works</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">DM to deploy</h2>
+          <p className="text-text-secondary text-lg max-w-xl mx-auto">Four steps. No dashboards, no signups, no waitlists.</p>
         </div>
-
         <div className="relative">
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-dim via-accent to-green-glow opacity-20 hidden md:block" />
-
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-electric-dim via-purple to-gold opacity-20 hidden md:block" />
           <div className="space-y-8">
             {steps.map((s, i) => (
               <div key={i} className="flex gap-6 md:gap-8 items-start group">
                 <div className="shrink-0 relative">
-                  <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${s.accent} flex items-center justify-center text-white font-bold text-lg opacity-80 group-hover:opacity-100 transition-opacity shadow-lg`}
-                  >
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${s.accent} flex items-center justify-center text-white font-bold text-lg opacity-80 group-hover:opacity-100 transition-opacity shadow-lg`}>
                     {s.num}
                   </div>
                 </div>
                 <div className="border-glow rounded-xl bg-bg-card/30 backdrop-blur-sm p-6 flex-1 group-hover:bg-bg-card/50 transition-colors">
-                  <h3 className="text-lg font-semibold text-text-primary mb-2">
-                    {s.title}
-                  </h3>
-                  <p className="text-text-secondary text-sm leading-relaxed">
-                    {s.description}
-                  </p>
+                  <h3 className="text-lg font-semibold text-text-primary mb-2">{s.title}</h3>
+                  <p className="text-text-secondary text-sm leading-relaxed">{s.description}</p>
                 </div>
               </div>
             ))}
@@ -569,7 +418,6 @@ function HowItWorks() {
 
 function TechStack() {
   const ref = useReveal();
-
   const badges = [
     { name: "Openclaw", description: "Agent framework" },
     { name: "Base", description: "L2 chain registry" },
@@ -581,27 +429,17 @@ function TechStack() {
     <section className="relative py-32 px-6" id="tech">
       <div ref={ref} className="max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-12">
-          <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-3">
-            Under the hood
-          </p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            Onchain-native stack
-          </h2>
+          <p className="text-purple text-sm font-semibold tracking-widest uppercase mb-3">Under the hood</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">Onchain-native stack</h2>
           <p className="text-text-secondary text-lg max-w-xl mx-auto">
-            Registered on Base as an{" "}
-            <span className="text-accent-bright font-medium">ERC-8004</span>{" "}
-            agent. Reputation is onchain — fully transparent, fully verifiable.
+            Registered on Base as an <span className="text-electric-bright font-medium">ERC-8004</span> agent. Reputation is onchain — fully transparent, fully verifiable.
           </p>
         </div>
-
         <div className="flex flex-wrap items-center justify-center gap-4">
           {badges.map((b, i) => (
-            <div
-              key={i}
-              className="group border-glow rounded-xl bg-bg-card/40 backdrop-blur-sm px-6 py-4 hover:bg-bg-card/60 transition-all duration-300 cursor-default hover:scale-[1.03]"
-            >
+            <div key={i} className="group border-glow rounded-xl bg-bg-card/40 backdrop-blur-sm px-6 py-4 hover:bg-bg-card/60 transition-all duration-300 cursor-default hover:scale-[1.03]">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-accent to-green-glow" />
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-electric to-gold" />
                 <div>
                   <span className="text-text-primary font-semibold text-sm">{b.name}</span>
                   <span className="text-text-muted text-xs ml-2">{b.description}</span>
@@ -615,38 +453,23 @@ function TechStack() {
         <div className="mt-12 max-w-md mx-auto border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
-              <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-accent-dim via-accent to-green-glow opacity-50 blur-[4px] animate-pulse-glow" />
-              <Image
-                src="/mascot.png"
-                alt="Moltino"
-                width={44}
-                height={44}
-                className="relative rounded-xl ring-1 ring-white/10"
-              />
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-glow border-2 border-bg-card animate-pulse" />
+              <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-electric-dim via-electric to-gold opacity-50 blur-[4px] animate-pulse-glow" />
+              <Image src="/mascot.png" alt="Moltino" width={44} height={44} className="relative rounded-xl ring-1 ring-white/10" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-electric border-2 border-bg-card animate-pulse" />
             </div>
             <div>
               <p className="text-text-primary font-semibold text-sm">moltino.eth</p>
               <p className="text-text-muted text-xs font-mono">ERC-8004 Registered Agent</p>
             </div>
-            <div className="ml-auto flex items-center gap-1.5 text-green-glow text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-glow animate-pulse" />
+            <div className="ml-auto flex items-center gap-1.5 text-electric text-xs font-medium">
+              <span className="w-2 h-2 rounded-full bg-electric animate-pulse" />
               Active
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-text-muted text-xs mb-1">Network</p>
-              <p className="text-text-primary text-sm font-medium">Base</p>
-            </div>
-            <div>
-              <p className="text-text-muted text-xs mb-1">Standard</p>
-              <p className="text-text-primary text-sm font-medium">ERC-8004</p>
-            </div>
-            <div>
-              <p className="text-text-muted text-xs mb-1">Status</p>
-              <p className="text-green-glow text-sm font-medium">Verified</p>
-            </div>
+            <div><p className="text-text-muted text-xs mb-1">Network</p><p className="text-text-primary text-sm font-medium">Base</p></div>
+            <div><p className="text-text-muted text-xs mb-1">Standard</p><p className="text-text-primary text-sm font-medium">ERC-8004</p></div>
+            <div><p className="text-text-muted text-xs mb-1">Status</p><p className="text-electric text-sm font-medium">Verified</p></div>
           </div>
         </div>
       </div>
@@ -660,41 +483,26 @@ function Footer() {
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h3 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Made for the{" "}
-            <span className="text-gradient">onchain future</span>
+            Made for the <span className="text-gradient">onchain future</span>
           </h3>
           <p className="text-text-secondary text-lg max-w-lg mx-auto mb-8">
             Agents that ship real work, get paid onchain, and build reputation over time. That's the bet.
           </p>
-          <a
-            href="https://x.com/projectmoltino"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300 backdrop-blur-sm"
-          >
+          <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
             <XIcon size={18} />
             Follow @projectmoltino
           </a>
         </div>
-
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border-subtle/30">
           <div className="flex items-center gap-2.5">
             <div className="relative">
-              <div className="absolute -inset-0.5 rounded-md bg-gradient-to-br from-accent to-green-glow opacity-40 blur-[2px]" />
-              <Image
-                src="/mascot.png"
-                alt="Moltino"
-                width={24}
-                height={24}
-                className="relative rounded-md ring-1 ring-white/10"
-              />
+              <div className="absolute -inset-0.5 rounded-md bg-gradient-to-br from-electric to-gold opacity-40 blur-[2px]" />
+              <Image src="/mascot.png" alt="Moltino" width={24} height={24} className="relative rounded-md ring-1 ring-white/10" />
             </div>
             <span className="text-text-muted text-sm">moltino.xyz</span>
           </div>
-
-          <p className="text-text-muted text-sm font-mono">
-            agents &gt; dashboards
-          </p>
+          <p className="text-text-muted text-sm font-mono">agents &gt; dashboards</p>
         </div>
       </div>
     </footer>
@@ -705,10 +513,8 @@ function Footer() {
 export default function Home() {
   return (
     <div className="relative space-grid noise-bg vignette">
-      {/* Global space background */}
       <Starfield />
       <NebulaBackground />
-
       <Navbar />
       <main className="relative z-10">
         <Hero />

@@ -1,17 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-primary: #050507;
-  --color-bg-secondary: #0a0a0f;
-  --color-bg-card: #12121a;
-  --color-border-subtle: #1e1e2e;
-  --color-accent: #a78bfa;
-  --color-accent-bright: #c4b5fd;
-  --color-accent-dim: #7c3aed;
-  --color-green-glow: #34d399;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #71717a;
+  --color-bg-primary: #04050a;
+  --color-bg-secondary: #080a14;
+  --color-bg-card: #0c0e1a;
+  --color-border-subtle: #1a1d2e;
+  --color-electric: #0ea5e9;
+  --color-electric-bright: #38bdf8;
+  --color-electric-dim: #0369a1;
+  --color-gold: #f59e0b;
+  --color-gold-bright: #fbbf24;
+  --color-gold-dim: #b45309;
+  --color-purple: #8b5cf6;
+  --color-purple-bright: #a78bfa;
+  --color-purple-dim: #6d28d9;
+  --color-text-primary: #f0f4ff;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
 }
 
 @layer base {
@@ -33,25 +38,17 @@
   }
 
   ::selection {
-    background-color: var(--color-accent-dim);
+    background-color: var(--color-electric-dim);
     color: white;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(135deg, var(--color-accent-bright) 0%, var(--color-accent) 50%, var(--color-green-glow) 100%);
+    background: linear-gradient(135deg, var(--color-gold-bright) 0%, var(--color-electric-bright) 45%, var(--color-purple-bright) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  .glow-accent {
-    box-shadow: 0 0 40px -10px var(--color-accent);
-  }
-
-  .glow-green {
-    box-shadow: 0 0 30px -8px var(--color-green-glow);
   }
 
   .border-glow {
@@ -66,47 +63,43 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, var(--color-accent-dim), transparent, var(--color-green-glow));
+    background: linear-gradient(135deg, var(--color-electric-dim), transparent, var(--color-purple-dim));
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 
   /* ── Full-page space grid ── */
   .space-grid {
     background-image:
-      linear-gradient(to right, rgba(167, 139, 250, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(14, 165, 233, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(14, 165, 233, 0.025) 1px, transparent 1px);
     background-size: 80px 80px;
   }
 
-  /* ── Vignette overlay for depth ── */
+  /* ── Vignette ── */
   .vignette::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 40%, var(--color-bg-primary) 100%);
+    background: radial-gradient(ellipse at center, transparent 30%, var(--color-bg-primary) 100%);
     pointer-events: none;
     z-index: 2;
-  }
-
-  .noise-bg {
-    position: relative;
   }
 
   .noise-bg::after {
     content: '';
     position: fixed;
     inset: 0;
-    opacity: 0.025;
+    opacity: 0.02;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 1;
   }
 
-  /* ── Aurora / nebula drift ── */
+  /* ── Nebula drift ── */
   @keyframes aurora-1 {
     0%, 100% { transform: translate(0, 0) scale(1); }
     25% { transform: translate(80px, -40px) scale(1.1); }
@@ -144,39 +137,20 @@
     left: 0;
     right: 0;
     height: 200px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(167, 139, 250, 0.012),
-      rgba(52, 211, 153, 0.008),
-      transparent
-    );
+    background: linear-gradient(to bottom, transparent, rgba(14,165,233,0.015), rgba(245,158,11,0.008), transparent);
     animation: scanline 8s linear infinite;
     pointer-events: none;
     z-index: 1;
   }
 
-  /* ── Section divider glow ── */
+  /* ── Section divider ── */
   .section-divider {
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      var(--color-accent-dim),
-      var(--color-accent),
-      var(--color-green-glow),
-      transparent
-    );
+    background: linear-gradient(to right, transparent, var(--color-electric-dim), var(--color-electric), var(--color-gold), transparent);
     opacity: 0.2;
   }
 
-  /* ── Twinkle for stars ── */
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.4); }
-  }
-
-  /* ── Basic keyframes ── */
+  /* ── Keyframes ── */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
@@ -188,19 +162,8 @@
   }
 
   @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes orbit {
@@ -213,31 +176,11 @@
     to { transform: rotate(0deg); }
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulse-glow 3s ease-in-out infinite;
-  }
-
-  .animate-fade-in-up {
-    animation: fade-in-up 0.8s ease-out forwards;
-    opacity: 0;
-  }
-
-  .animate-shimmer {
-    background-size: 200% auto;
-    animation: shimmer 3s linear infinite;
-  }
-
-  .animate-orbit {
-    animation: orbit 12s linear infinite;
-  }
-
-  .animate-orbit-reverse {
-    animation: orbit-reverse 16s linear infinite;
-  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; opacity: 0; }
+  .animate-orbit { animation: orbit 12s linear infinite; }
+  .animate-orbit-reverse { animation: orbit-reverse 16s linear infinite; }
 
   .delay-100 { animation-delay: 0.1s; }
   .delay-200 { animation-delay: 0.2s; }
