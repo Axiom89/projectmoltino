@@ -28,83 +28,78 @@ function useReveal() {
   return ref;
 }
 
-/* ──────────────────── Particle Canvas Background ────────────────────── */
-function ParticleField() {
+/* ──────────────────── Starfield Canvas ──────────────────────────────── */
+function Starfield() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const animate = useCallback(() => {
+  const init = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = document.body.scrollHeight * dpr;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = document.body.scrollHeight + "px";
+    const w = window.innerWidth;
+    const h = Math.max(document.body.scrollHeight, window.innerHeight * 4);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
     ctx.scale(dpr, dpr);
 
-    const w = window.innerWidth;
-    const h = document.body.scrollHeight;
-    const particleCount = Math.floor((w * h) / 18000);
-
-    interface Particle {
+    interface Star {
       x: number;
       y: number;
       r: number;
-      dx: number;
-      dy: number;
-      opacity: number;
+      baseOpacity: number;
+      twinkleSpeed: number;
+      twinkleOffset: number;
       color: string;
     }
 
-    const particles: Particle[] = [];
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
+    const stars: Star[] = [];
+    const count = Math.floor((w * h) / 3000);
+
+    for (let i = 0; i < count; i++) {
+      const isBright = Math.random() > 0.92;
+      const isAccent = Math.random() > 0.85;
+      stars.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: Math.random() * 1.5 + 0.3,
-        dx: (Math.random() - 0.5) * 0.15,
-        dy: (Math.random() - 0.5) * 0.1,
-        opacity: Math.random() * 0.4 + 0.05,
-        color: Math.random() > 0.6 ? "#a78bfa" : Math.random() > 0.5 ? "#34d399" : "#71717a",
+        r: isBright ? Math.random() * 2 + 1 : Math.random() * 1.2 + 0.2,
+        baseOpacity: isBright ? Math.random() * 0.6 + 0.4 : Math.random() * 0.35 + 0.05,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleOffset: Math.random() * Math.PI * 2,
+        color: isAccent
+          ? Math.random() > 0.5 ? "#a78bfa" : "#34d399"
+          : "#ffffff",
       });
     }
 
     let frameId: number;
+    let time = 0;
+
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      for (const p of particles) {
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0) p.x = w;
-        if (p.x > w) p.x = 0;
-        if (p.y < 0) p.y = h;
-        if (p.y > h) p.y = 0;
+      time += 1;
+
+      for (const s of stars) {
+        const twinkle = Math.sin(time * s.twinkleSpeed + s.twinkleOffset);
+        const opacity = s.baseOpacity + twinkle * 0.2;
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.opacity;
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = Math.max(0.02, Math.min(1, opacity));
         ctx.fill();
-      }
 
-      // Draw faint connections between nearby particles
-      ctx.globalAlpha = 0.03;
-      ctx.strokeStyle = "#a78bfa";
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = dx * dx + dy * dy;
-          if (dist < 8000) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
+        // Glow for brighter stars
+        if (s.r > 1.2) {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = s.color;
+          ctx.globalAlpha = Math.max(0, opacity * 0.08);
+          ctx.fill();
         }
       }
 
@@ -117,41 +112,73 @@ function ParticleField() {
   }, []);
 
   useEffect(() => {
-    const cleanup = animate();
-
+    const cleanup = init();
     const handleResize = () => {
       if (cleanup) cleanup();
-      animate();
+      init();
     };
-
     window.addEventListener("resize", handleResize);
     return () => {
       if (cleanup) cleanup();
       window.removeEventListener("resize", handleResize);
     };
-  }, [animate]);
+  }, [init]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.6 }}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
     />
   );
 }
 
-/* ──────────────────── Aurora Blob Background ────────────────────────── */
-function AuroraBlobs() {
+/* ──────────────────── Nebula / Aurora Background ────────────────────── */
+function NebulaBackground() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Top-left purple blob */}
-      <div className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] rounded-full bg-accent-dim/[0.04] blur-[100px] animate-aurora-1" />
-      {/* Center-right green blob */}
-      <div className="absolute top-[30%] -right-[5%] w-[500px] h-[500px] rounded-full bg-green-glow/[0.03] blur-[120px] animate-aurora-2" />
-      {/* Bottom-center mixed blob */}
-      <div className="absolute top-[60%] left-[20%] w-[700px] h-[400px] rounded-full bg-accent/[0.025] blur-[130px] animate-aurora-3" />
-      {/* Bottom-right accent */}
-      <div className="absolute top-[80%] right-[10%] w-[400px] h-[400px] rounded-full bg-accent-dim/[0.03] blur-[100px] animate-aurora-1" style={{ animationDelay: "10s" }} />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+      {/* Deep purple nebula — top */}
+      <div
+        className="absolute -top-[15%] -left-[10%] w-[800px] h-[600px] rounded-full animate-aurora-1"
+        style={{
+          background: "radial-gradient(ellipse, rgba(124,58,237,0.06) 0%, rgba(124,58,237,0.02) 40%, transparent 70%)",
+          filter: "blur(80px)",
+        }}
+      />
+      {/* Green nebula — right side */}
+      <div
+        className="absolute top-[25%] -right-[8%] w-[600px] h-[500px] rounded-full animate-aurora-2"
+        style={{
+          background: "radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, rgba(52,211,153,0.015) 40%, transparent 70%)",
+          filter: "blur(100px)",
+        }}
+      />
+      {/* Purple haze — mid page */}
+      <div
+        className="absolute top-[50%] left-[15%] w-[700px] h-[500px] rounded-full animate-aurora-3"
+        style={{
+          background: "radial-gradient(ellipse, rgba(167,139,250,0.04) 0%, transparent 60%)",
+          filter: "blur(110px)",
+        }}
+      />
+      {/* Warm nebula — bottom */}
+      <div
+        className="absolute top-[70%] right-[15%] w-[500px] h-[500px] rounded-full animate-aurora-1"
+        style={{
+          background: "radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, rgba(52,211,153,0.02) 50%, transparent 70%)",
+          filter: "blur(90px)",
+          animationDelay: "12s",
+        }}
+      />
+      {/* Bottom-left accent */}
+      <div
+        className="absolute top-[85%] -left-[5%] w-[400px] h-[300px] rounded-full animate-aurora-2"
+        style={{
+          background: "radial-gradient(ellipse, rgba(52,211,153,0.04) 0%, transparent 60%)",
+          filter: "blur(80px)",
+          animationDelay: "8s",
+        }}
+      />
     </div>
   );
 }
@@ -213,7 +240,7 @@ function XIcon({ size = 16 }: { size?: number }) {
 
 function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border-subtle/50 backdrop-blur-xl bg-bg-primary/70">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border-subtle/50 backdrop-blur-xl bg-bg-primary/60">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="relative group">
@@ -244,12 +271,10 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden grid-bg noise-bg scanline-overlay">
-      {/* Ambient glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-accent-dim/10 blur-[120px] animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-green-glow/8 blur-[100px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
-      {/* Extra: top-right warm glow */}
-      <div className="absolute top-10 right-[10%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.04] blur-[80px] animate-aurora-2" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden scanline-overlay">
+      {/* Hero-specific extra glow */}
+      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] rounded-full bg-accent-dim/[0.07] blur-[150px] animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-green-glow/[0.05] blur-[120px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-24">
         {/* Mascot with orbital rings */}
@@ -258,32 +283,30 @@ function Hero() {
             {/* Outer glow pulse */}
             <div className="absolute inset-0 rounded-full bg-accent/15 blur-[60px] scale-125 animate-pulse-glow" />
 
-            {/* Orbit ring 1 — slow */}
+            {/* Orbit ring 1 */}
             <div className="absolute inset-2 animate-orbit">
               <div className="relative w-full h-full">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-accent-bright shadow-[0_0_12px_rgba(196,181,253,0.8)]" />
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-glow shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
               </div>
             </div>
-            {/* Orbit ring 1 border */}
             <div className="absolute inset-2 rounded-full border border-dashed border-accent/10" />
 
-            {/* Orbit ring 2 — reversed, tighter */}
+            {/* Orbit ring 2 */}
             <div className="absolute inset-10 animate-orbit-reverse">
               <div className="relative w-full h-full">
                 <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-glow shadow-[0_0_10px_rgba(52,211,153,0.6)]" />
                 <div className="absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(167,139,250,0.6)]" />
               </div>
             </div>
-            {/* Orbit ring 2 border */}
             <div className="absolute inset-10 rounded-full border border-accent-dim/10" />
 
-            {/* Hexagonal-ish frame behind image */}
+            {/* Frame behind image */}
             <div className="absolute inset-[52px] rounded-[28px] bg-gradient-to-br from-accent-dim/30 via-transparent to-green-glow/20 p-[1.5px]">
               <div className="w-full h-full rounded-[27px] bg-bg-primary" />
             </div>
 
-            {/* The mascot image */}
+            {/* Mascot */}
             <Image
               src="/mascot.png"
               alt="Moltino Agent"
@@ -296,7 +319,7 @@ function Hero() {
               }}
             />
 
-            {/* Corner accent dots */}
+            {/* Accent dots */}
             <div className="absolute top-6 right-6 w-1 h-1 rounded-full bg-accent-bright/60 animate-pulse" />
             <div className="absolute bottom-8 left-5 w-1 h-1 rounded-full bg-green-glow/50 animate-pulse" style={{ animationDelay: "1s" }} />
             <div className="absolute top-12 left-3 w-0.5 h-0.5 rounded-full bg-accent/40 animate-pulse" style={{ animationDelay: "2s" }} />
@@ -304,7 +327,7 @@ function Hero() {
         </div>
 
         {/* Status badge */}
-        <div className="animate-fade-in-up delay-100 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-dim/30 bg-accent-dim/5 text-accent-bright text-sm font-medium mb-8">
+        <div className="animate-fade-in-up delay-100 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-dim/30 bg-accent-dim/5 text-accent-bright text-sm font-medium mb-8 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-green-glow animate-pulse" />
           Building in public
         </div>
@@ -338,7 +361,7 @@ function Hero() {
           </a>
           <a
             href="#how-it-works"
-            className="px-8 py-3.5 rounded-xl border border-border-subtle text-text-secondary font-medium text-base hover:text-text-primary hover:border-text-muted transition-all duration-300"
+            className="px-8 py-3.5 rounded-xl border border-border-subtle text-text-secondary font-medium text-base hover:text-text-primary hover:border-text-muted transition-all duration-300 backdrop-blur-sm"
           >
             See how it works
           </a>
@@ -346,7 +369,7 @@ function Hero() {
 
         {/* Terminal preview */}
         <div className="animate-fade-in-up delay-700 mt-16 max-w-lg mx-auto">
-          <div className="border-glow rounded-xl bg-bg-secondary/80 backdrop-blur-sm p-5 text-left font-mono text-sm">
+          <div className="border-glow rounded-xl bg-bg-secondary/70 backdrop-blur-md p-5 text-left font-mono text-sm">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
@@ -437,7 +460,7 @@ function WhatItDoes() {
           {features.map((f, i) => (
             <div
               key={i}
-              className="group border-glow rounded-2xl bg-bg-card/50 backdrop-blur-sm p-8 hover:bg-bg-card/80 transition-all duration-500 hover:scale-[1.01]"
+              className="group border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-8 hover:bg-bg-card/60 transition-all duration-500 hover:scale-[1.01]"
             >
               <div className="flex items-start gap-5">
                 <div className="shrink-0 w-14 h-14 rounded-xl bg-accent-dim/10 border border-accent-dim/20 flex items-center justify-center text-accent group-hover:text-accent-bright group-hover:border-accent-dim/40 transition-colors">
@@ -501,9 +524,6 @@ function HowItWorks() {
 
   return (
     <section className="relative py-32 px-6" id="how-it-works">
-      {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-dim/[0.02] to-transparent pointer-events-none" />
-
       <div ref={ref} className="relative max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-16">
           <p className="text-green-glow text-sm font-semibold tracking-widest uppercase mb-3">
@@ -518,13 +538,11 @@ function HowItWorks() {
         </div>
 
         <div className="relative">
-          {/* Vertical line */}
           <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-dim via-accent to-green-glow opacity-20 hidden md:block" />
 
           <div className="space-y-8">
             {steps.map((s, i) => (
               <div key={i} className="flex gap-6 md:gap-8 items-start group">
-                {/* Step number */}
                 <div className="shrink-0 relative">
                   <div
                     className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${s.accent} flex items-center justify-center text-white font-bold text-lg opacity-80 group-hover:opacity-100 transition-opacity shadow-lg`}
@@ -532,9 +550,7 @@ function HowItWorks() {
                     {s.num}
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="border-glow rounded-xl bg-bg-card/40 backdrop-blur-sm p-6 flex-1 group-hover:bg-bg-card/60 transition-colors">
+                <div className="border-glow rounded-xl bg-bg-card/30 backdrop-blur-sm p-6 flex-1 group-hover:bg-bg-card/50 transition-colors">
                   <h3 className="text-lg font-semibold text-text-primary mb-2">
                     {s.title}
                   </h3>
@@ -555,22 +571,10 @@ function TechStack() {
   const ref = useReveal();
 
   const badges = [
-    {
-      name: "Openclaw",
-      description: "Agent framework",
-    },
-    {
-      name: "Base",
-      description: "L2 chain registry",
-    },
-    {
-      name: "ERC-8004",
-      description: "Onchain agent identity",
-    },
-    {
-      name: "x402",
-      description: "Agent payment protocol",
-    },
+    { name: "Openclaw", description: "Agent framework" },
+    { name: "Base", description: "L2 chain registry" },
+    { name: "ERC-8004", description: "Onchain agent identity" },
+    { name: "x402", description: "Agent payment protocol" },
   ];
 
   return (
@@ -594,17 +598,13 @@ function TechStack() {
           {badges.map((b, i) => (
             <div
               key={i}
-              className="group border-glow rounded-xl bg-bg-card/50 px-6 py-4 hover:bg-bg-card/80 transition-all duration-300 cursor-default hover:scale-[1.03]"
+              className="group border-glow rounded-xl bg-bg-card/40 backdrop-blur-sm px-6 py-4 hover:bg-bg-card/60 transition-all duration-300 cursor-default hover:scale-[1.03]"
             >
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-accent to-green-glow" />
                 <div>
-                  <span className="text-text-primary font-semibold text-sm">
-                    {b.name}
-                  </span>
-                  <span className="text-text-muted text-xs ml-2">
-                    {b.description}
-                  </span>
+                  <span className="text-text-primary font-semibold text-sm">{b.name}</span>
+                  <span className="text-text-muted text-xs ml-2">{b.description}</span>
                 </div>
               </div>
             </div>
@@ -612,7 +612,7 @@ function TechStack() {
         </div>
 
         {/* Agent ID card */}
-        <div className="mt-12 max-w-md mx-auto border-glow rounded-2xl bg-bg-card/50 backdrop-blur-sm p-6">
+        <div className="mt-12 max-w-md mx-auto border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
               <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-accent-dim via-accent to-green-glow opacity-50 blur-[4px] animate-pulse-glow" />
@@ -626,12 +626,8 @@ function TechStack() {
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-glow border-2 border-bg-card animate-pulse" />
             </div>
             <div>
-              <p className="text-text-primary font-semibold text-sm">
-                moltino.eth
-              </p>
-              <p className="text-text-muted text-xs font-mono">
-                ERC-8004 Registered Agent
-              </p>
+              <p className="text-text-primary font-semibold text-sm">moltino.eth</p>
+              <p className="text-text-muted text-xs font-mono">ERC-8004 Registered Agent</p>
             </div>
             <div className="ml-auto flex items-center gap-1.5 text-green-glow text-xs font-medium">
               <span className="w-2 h-2 rounded-full bg-green-glow animate-pulse" />
@@ -661,10 +657,7 @@ function TechStack() {
 function Footer() {
   return (
     <footer className="relative border-t border-border-subtle/50 py-16 px-6">
-      <div className="absolute inset-0 bg-gradient-to-t from-accent-dim/[0.03] to-transparent pointer-events-none" />
-
       <div className="relative max-w-6xl mx-auto">
-        {/* CTA banner */}
         <div className="text-center mb-16">
           <h3 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
             Made for the{" "}
@@ -677,14 +670,13 @@ function Footer() {
             href="https://x.com/projectmoltino"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300 backdrop-blur-sm"
           >
             <XIcon size={18} />
             Follow @projectmoltino
           </a>
         </div>
 
-        {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border-subtle/30">
           <div className="flex items-center gap-2.5">
             <div className="relative">
@@ -697,9 +689,7 @@ function Footer() {
                 className="relative rounded-md ring-1 ring-white/10"
               />
             </div>
-            <span className="text-text-muted text-sm">
-              moltino.xyz
-            </span>
+            <span className="text-text-muted text-sm">moltino.xyz</span>
           </div>
 
           <p className="text-text-muted text-sm font-mono">
@@ -714,10 +704,10 @@ function Footer() {
 /* ─────────────────────────── Main Page ──────────────────────────────── */
 export default function Home() {
   return (
-    <>
-      {/* Global background effects */}
-      <ParticleField />
-      <AuroraBlobs />
+    <div className="relative space-grid noise-bg vignette">
+      {/* Global space background */}
+      <Starfield />
+      <NebulaBackground />
 
       <Navbar />
       <main className="relative z-10">
@@ -730,6 +720,6 @@ export default function Home() {
         <TechStack />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
