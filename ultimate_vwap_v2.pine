@@ -1,0 +1,204 @@
+//@version=6
+indicator("Ultimate VWAP v2", overlay=true, max_labels_count=11, max_bars_back=5000)
+
+// ---- Timeframe calculations for rolling VWAPs ----
+tf_seconds = timeframe.in_seconds(timeframe.period)
+
+// Calculate bar lengths directly from total period seconds / timeframe seconds
+// This avoids rounding errors when bars_per_day < 1 (e.g. 3D, weekly timeframes)
+f_period_len(days) =>
+    math.max(1, math.round(days * 86400 / tf_seconds))
+
+// ---- Group for Rolling VWAPs ----
+group_rolling = "Rolling VWAPs"
+
+show_7d = input.bool(false, title="Show 7-Day", group=group_rolling)
+color_7d = input.color(color.new(#f3218a, 0), "7D Color", group=group_rolling)
+show_30d = input.bool(false, title="Show 30-Day", group=group_rolling)
+color_30d = input.color(color.new(color.green, 0), "30D Color", group=group_rolling)
+show_90d = input.bool(false, title="Show 90-Day", group=group_rolling)
+color_90d = input.color(color.new(#1500ff, 0), "90D Color", group=group_rolling)
+show_360d = input.bool(false, title="Show 360-Day", group=group_rolling)
+color_360d = input.color(color.new(#ff6600, 0), "360D Color", group=group_rolling)
+
+// ---- Group for Fixed Anchored VWAPs ----
+group_fixed = "Fixed Anchored VWAPs"
+
+show_yearly = input.bool(false, title="Show Yearly", group=group_fixed)
+color_yearly = input.color(color.new(#dc0202, 0), "Yearly Color", group=group_fixed)
+
+// ---- Group for Listing VWAP ----
+group_chart = "Listing VWAP"
+
+show_chart_start = input.bool(false, title="Listing VWAP", group=group_chart)
+color_chart_start = input.color(color.new(#860101, 0), "Listing", group=group_chart)
+listing_year = input.int(2020, title="Listing Year", minval=1900, maxval=2100, group=group_chart)
+listing_month = input.int(1, title="Listing Month", minval=1, maxval=12, group=group_chart)
+listing_day = input.int(1, title="Listing Day", minval=1, maxval=31, group=group_chart)
+
+// ---- Value Area Settings ----
+group_va = "Value Area Settings"
+
+band_multiplier_1 = input.float(1.0, title="Band Multiplier 1", minval=0.1, maxval=3.0, step=0.1, group=group_va)
+band_multiplier_2 = input.float(2.0, title="Band Multiplier 2", minval=0.1, maxval=3.0, step=0.1, group=group_va)
+
+// ============================================================
+// ROLLING VWAP
+// ============================================================
+len_7d   = f_period_len(7)
+len_30d  = f_period_len(30)
+len_90d  = f_period_len(90)
+len_360d = f_period_len(360)
+
+f_rolling_vwap(len) =>
+    cum_pv = ta.cum(hlc3 * volume)
+    cum_v  = ta.cum(volume)
+    pv = cum_pv - nz(cum_pv[len], 0.0)
+    v  = cum_v  - nz(cum_v[len], 0.0)
+    v > 0 ? pv / v : na
+
+f_rolling_bands(vwap_val, len, mult) =>
+    cum_v = ta.cum(volume)
+    v_sum = cum_v - nz(cum_v[len], 0.0)
+    dev_sq_vol = nz(math.pow(hlc3 - vwap_val, 2) * volume, 0.0)
+    cum_dsv = ta.cum(dev_sq_vol)
+    dsv_sum = cum_dsv - nz(cum_dsv[len], 0.0)
+    variance = dsv_sum / math.max(v_sum, 1e-10)
+    std = math.sqrt(variance)
+    if v_sum > 0
+        [vwap_val - mult * std, vwap_val + mult * std]
+    else
+        [na, na]
+
+vwap7   = f_rolling_vwap(len_7d)
+vwap30  = f_rolling_vwap(len_30d)
+vwap90  = f_rolling_vwap(len_90d)
+vwap360 = f_rolling_vwap(len_360d)
+
+[val7a, vah7a]     = f_rolling_bands(vwap7, len_7d, band_multiplier_1)
+[val7b, vah7b]     = f_rolling_bands(vwap7, len_7d, band_multiplier_2)
+[val30a, vah30a]   = f_rolling_bands(vwap30, len_30d, band_multiplier_1)
+[val30b, vah30b]   = f_rolling_bands(vwap30, len_30d, band_multiplier_2)
+[val90a, vah90a]   = f_rolling_bands(vwap90, len_90d, band_multiplier_1)
+[val90b, vah90b]   = f_rolling_bands(vwap90, len_90d, band_multiplier_2)
+[val360a, vah360a] = f_rolling_bands(vwap360, len_360d, band_multiplier_1)
+[val360b, vah360b] = f_rolling_bands(vwap360, len_360d, band_multiplier_2)
+
+// ============================================================
+// FIXED ANCHORED VWAP (Yearly + Listing)
+// ============================================================
+f_anchored_vwap(condition, src) =>
+    var float vwap_sum = 0.0
+    var float volume_sum = 0.0
+    var bool is_reset = false
+    if condition
+        vwap_sum := src * volume
+        volume_sum := volume
+        is_reset := true
+    else
+        vwap_sum += src * volume
+        volume_sum += volume
+        is_reset := false
+    if is_reset and bar_index > 0
+        na
+    else
+        volume_sum > 0 ? vwap_sum / volume_sum : na
+
+f_chart_start_vwap() =>
+    listing_timestamp = timestamp(listing_year, listing_month, listing_day, 0, 0)
+    var float chart_pv_sum = 0.0
+    var float chart_vol_sum = 0.0
+    var bool is_started = false
+    if time >= listing_timestamp
+        if not is_started
+            chart_pv_sum := hlc3 * volume
+            chart_vol_sum := volume
+            is_started := true
+        else
+            chart_pv_sum += hlc3 * volume
+            chart_vol_sum += volume
+    chart_vol_sum > 0 ? chart_pv_sum / chart_vol_sum : na
+
+f_val_vah_anchored(condition, vwap_value, mult) =>
+    var float sum_dev = 0.0
+    var float vol_sum = 0.0
+    if condition
+        sum_dev := 0.0
+        vol_sum := 0.0
+    if not na(vwap_value)
+        dev = hlc3 - vwap_value
+        sum_dev += dev * dev * volume
+        vol_sum += volume
+    if vol_sum > 0
+        std_dev = math.sqrt(sum_dev / vol_sum)
+        [vwap_value - mult * std_dev, vwap_value + mult * std_dev]
+    else
+        [na, na]
+
+f_val_vah_chart(vwap_value, mult) =>
+    listing_timestamp = timestamp(listing_year, listing_month, listing_day, 0, 0)
+    var float sum_dev = 0.0
+    var float vol_sum = 0.0
+    var bool is_started = false
+    if time >= listing_timestamp
+        if not is_started
+            sum_dev := 0.0
+            vol_sum := 0.0
+            is_started := true
+        if not na(vwap_value)
+            dev = hlc3 - vwap_value
+            sum_dev += dev * dev * volume
+            vol_sum += volume
+    if vol_sum > 0
+        std_dev = math.sqrt(sum_dev / vol_sum)
+        [vwap_value - mult * std_dev, vwap_value + mult * std_dev]
+    else
+        [na, na]
+
+yearly_reset = year(time) != year(time[1])
+yearly_vwap = f_anchored_vwap(yearly_reset, hlc3)
+chart_start_vwap = f_chart_start_vwap()
+
+[val_yearly_a, vah_yearly_a] = f_val_vah_anchored(yearly_reset, yearly_vwap, band_multiplier_1)
+[val_yearly_b, vah_yearly_b] = f_val_vah_anchored(yearly_reset, yearly_vwap, band_multiplier_2)
+[val_chart_a, vah_chart_a]   = f_val_vah_chart(chart_start_vwap, band_multiplier_1)
+[val_chart_b, vah_chart_b]   = f_val_vah_chart(chart_start_vwap, band_multiplier_2)
+
+// ============================================================
+// PLOTTING
+// ============================================================
+plot(show_7d ? vwap7 : na, "7D VWAP", color=color_7d)
+plot(show_7d ? val7a : na, "7D VAL1", color=color.new(color_7d, 60))
+plot(show_7d ? vah7a : na, "7D VAH1", color=color.new(color_7d, 60))
+plot(show_7d ? val7b : na, "7D VAL2", color=color.new(color_7d, 80))
+plot(show_7d ? vah7b : na, "7D VAH2", color=color.new(color_7d, 80))
+
+plot(show_30d ? vwap30 : na, "30D VWAP", color=color_30d)
+plot(show_30d ? val30a : na, "30D VAL1", color=color.new(color_30d, 60))
+plot(show_30d ? vah30a : na, "30D VAH1", color=color.new(color_30d, 60))
+plot(show_30d ? val30b : na, "30D VAL2", color=color.new(color_30d, 80))
+plot(show_30d ? vah30b : na, "30D VAH2", color=color.new(color_30d, 80))
+
+plot(show_90d ? vwap90 : na, "90D VWAP", color=color_90d)
+plot(show_90d ? val90a : na, "90D VAL1", color=color.new(color_90d, 60))
+plot(show_90d ? vah90a : na, "90D VAH1", color=color.new(color_90d, 60))
+plot(show_90d ? val90b : na, "90D VAL2", color=color.new(color_90d, 80))
+plot(show_90d ? vah90b : na, "90D VAH2", color=color.new(color_90d, 80))
+
+plot(show_360d ? vwap360 : na, "360D VWAP", color=color_360d)
+plot(show_360d ? val360a : na, "360D VAL1", color=color.new(color_360d, 60))
+plot(show_360d ? vah360a : na, "360D VAH1", color=color.new(color_360d, 60))
+plot(show_360d ? val360b : na, "360D VAL2", color=color.new(color_360d, 80))
+plot(show_360d ? vah360b : na, "360D VAH2", color=color.new(color_360d, 80))
+
+plot(show_yearly ? yearly_vwap : na, "Yearly VWAP", color=color_yearly)
+plot(show_yearly ? val_yearly_a : na, "Yearly VAL1", color=color.new(color_yearly, 60))
+plot(show_yearly ? vah_yearly_a : na, "Yearly VAH1", color=color.new(color_yearly, 60))
+plot(show_yearly ? val_yearly_b : na, "Yearly VAL2", color=color.new(color_yearly, 80))
+plot(show_yearly ? vah_yearly_b : na, "Yearly VAH2", color=color.new(color_yearly, 80))
+
+plot(show_chart_start ? chart_start_vwap : na, "Listing VWAP", color=color_chart_start)
+plot(show_chart_start ? val_chart_a : na, "Listing VAL1", color=color.new(color_chart_start, 60))
+plot(show_chart_start ? vah_chart_a : na, "Listing VAH1", color=color.new(color_chart_start, 60))
+plot(show_chart_start ? val_chart_b : na, "Listing VAL2", color=color.new(color_chart_start, 80))
+plot(show_chart_start ? vah_chart_b : na, "Listing VAH2", color=color.new(color_chart_start, 80))
