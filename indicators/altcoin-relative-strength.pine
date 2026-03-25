@@ -21,11 +21,12 @@ maColor   = input.color(#FF9800, "Signal MA Color")
 othersClose = request.security(othersSymbol, timeframe.period, close)
 
 // ─── Relative Strength RSI ────────────────────────────────────────────────────
-// Ratio of altcoin to OTHERS mcap — then apply RSI to that ratio
-// When the altcoin outperforms OTHERS, the ratio rises → RSI goes up
-// When the altcoin underperforms OTHERS, the ratio falls → RSI goes down
-ratio = close / othersClose
-rsRsi = ta.rsi(ratio, rsLength)
+// Log of ratio avoids floating point precision loss from dividing
+// a small altcoin price by a massive market cap value.
+// When the altcoin outperforms OTHERS, logRatio rises → RSI goes up
+// When the altcoin underperforms OTHERS, logRatio falls → RSI goes down
+logRatio = math.log(close) - math.log(othersClose)
+rsRsi    = ta.rsi(logRatio, rsLength)
 
 // ─── Signal MA ────────────────────────────────────────────────────────────────
 signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
