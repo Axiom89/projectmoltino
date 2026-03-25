@@ -7,41 +7,49 @@ indicator("Altcoin Relative Strength vs OTHERS", shorttitle="Alt RS", overlay=fa
 // ─── Inputs ───────────────────────────────────────────────────────────────────
 othersSymbol = input.string("CRYPTOCAP:OTHERS", "OTHERS Market Cap Symbol", tooltip="Market cap excluding top 10 coins")
 rsLength     = input.int(14, "RSI Length", minval=2)
-maLength     = input.int(14, "Signal MA Length", minval=1)
-maType       = input.string("SMA", "Signal MA Type", options=["SMA", "EMA"])
+smoothLen    = input.int(5, "Smoothing Length", minval=1, tooltip="Smooths the RS line to reduce noise — higher = fewer whipsaws")
+maLength     = input.int(21, "Signal MA Length", minval=1)
+maType       = input.string("EMA", "Signal MA Type", options=["SMA", "EMA"])
 obLevel      = input.float(70.0, "Overbought Level", minval=50.0, maxval=100.0)
 osLevel      = input.float(30.0, "Oversold Level", minval=0.0, maxval=50.0)
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
-bullColor = input.color(#26a69a, "Bull Color")
-bearColor = input.color(#ef5350, "Bear Color")
+bullColor = input.color(#26a69a, "Outperforming Color")
+bearColor = input.color(#ef5350, "Underperforming Color")
 maColor   = input.color(#FF9800, "Signal MA Color")
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 othersClose = request.security(othersSymbol, timeframe.period, close)
 
 // ─── Relative Strength RSI ────────────────────────────────────────────────────
-// Log of ratio avoids floating point precision loss from dividing
-// a small altcoin price by a massive market cap value.
-// When the altcoin outperforms OTHERS, logRatio rises → RSI goes up
-// When the altcoin underperforms OTHERS, logRatio falls → RSI goes down
+// Log ratio avoids floating point precision loss (altcoin price / billions mcap)
+// Above 50 = outperforming OTHERS, below 50 = underperforming
 logRatio = math.log(close) - math.log(othersClose)
-rsRsi    = ta.rsi(logRatio, rsLength)
+rawRsi   = ta.rsi(logRatio, rsLength)
+
+// Smooth the RSI to reduce whipsaw — cleaner signal
+rsRsi = ta.ema(rawRsi, smoothLen)
 
 // ─── Signal MA ────────────────────────────────────────────────────────────────
 signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
 
 // ─── Color Logic ──────────────────────────────────────────────────────────────
-rsColor   = rsRsi >= signalMa ? bullColor : bearColor
-fillColor = rsRsi >= signalMa ? color.new(bullColor, 85) : color.new(bearColor, 85)
+// Color based on position relative to 50 midline — clear outperform/underperform
+rsColor      = rsRsi >= 50.0 ? bullColor : bearColor
+fillBullCol  = color.new(bullColor, 75)
+fillBearCol  = color.new(bearColor, 75)
 
 // ─── Plotting ─────────────────────────────────────────────────────────────────
-rsPlot = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
-maPlot = plot(signalMa, "Signal MA", color=maColor, linewidth=1)
-fill(rsPlot, maPlot, color=fillColor)
+midPlot = plot(50.0, "Midline", color=color.new(color.white, 60), linewidth=1)
+rsPlot  = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
+plot(signalMa, "Signal MA", color=maColor, linewidth=1)
 
+// Fill between RS line and midline — green above 50, red below 50
+fill(rsPlot, midPlot, rsRsi, 50.0, fillBullCol, color.new(color.gray, 100), title="Bull Fill")
+fill(rsPlot, midPlot, 50.0, rsRsi, color.new(color.gray, 100), fillBearCol, title="Bear Fill")
+
+// OB / OS
 h1 = hline(obLevel, "Overbought", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
-hline(50.0, "Midline", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
 h2 = hline(osLevel, "Oversold", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
 fill(h1, h2, color=color.new(color.gray, 95), title="OB/OS Background")
 
@@ -50,5 +58,5 @@ alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS
 alertcondition(ta.crossunder(rsRsi, osLevel), "RS Oversold", "{{ticker}} Alt RS entered oversold vs OTHERS")
 alertcondition(ta.crossover(rsRsi, signalMa), "RS Cross Above Signal", "{{ticker}} Alt RS crossed above signal MA")
 alertcondition(ta.crossunder(rsRsi, signalMa), "RS Cross Below Signal", "{{ticker}} Alt RS crossed below signal MA")
-alertcondition(ta.crossover(rsRsi, 50.0), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline")
-alertcondition(ta.crossunder(rsRsi, 50.0), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline")
+alertcondition(ta.crossover(rsRsi, 50.0), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline — outperforming")
+alertcondition(ta.crossunder(rsRsi, 50.0), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline — underperforming")
