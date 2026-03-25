@@ -44,14 +44,9 @@ plot(signalMa, "Signal MA", color=maColor, linewidth=2)
 fill(rsPlot, midPlot, rsRsi, 50.0, fillBullCol, color.new(color.gray, 100), title="Bull Fill")
 fill(rsPlot, midPlot, 50.0, rsRsi, color.new(color.gray, 100), fillBearCol, title="Bear Fill")
 
-// OB / OS bands with colored fill between them and the midline
-h1 = hline(obLevel, "Overbought", color=color.new(bullColor, 50), linestyle=hline.style_dashed)
-hMid = hline(50.0, "Mid hline", color=color.new(color.white, 100))
-h2 = hline(osLevel, "Oversold", color=color.new(bearColor, 50), linestyle=hline.style_dashed)
-
-// The band between OB and midline tinted green, between OS and midline tinted red
-fill(h1, hMid, color=color.new(bullColor, 92), title="OB Zone Tint")
-fill(hMid, h2, color=color.new(bearColor, 92), title="OS Zone Tint")
+// OB / OS lines
+hline(obLevel, "Overbought", color=color.new(bullColor, 50), linestyle=hline.style_dashed)
+hline(osLevel, "Oversold", color=color.new(bearColor, 50), linestyle=hline.style_dashed)
 
 // ─── Alerts ───────────────────────────────────────────────────────────────────
 alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS entered overbought vs OTHERS")
