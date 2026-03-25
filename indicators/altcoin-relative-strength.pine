@@ -5,94 +5,53 @@
 indicator("Altcoin Relative Strength vs OTHERS", shorttitle="Alt RS", overlay=false, precision=2)
 
 // ─── Inputs ───────────────────────────────────────────────────────────────────
-othersSymbol    = input.string("CRYPTOCAP:OTHERS", "OTHERS Market Cap Symbol", tooltip="Market cap excluding top 10 coins")
-rsLength        = input.int(14, "RS Ratio SMA Length", minval=1)
-rsiLength       = input.int(14, "RSI of RS Length", minval=1)
-showHistogram   = input.bool(true, "Show Histogram")
-showMa          = input.bool(true, "Show RS Ratio MA")
-maLength        = input.int(50, "RS Ratio MA Length", minval=1)
-maType          = input.string("SMA", "MA Type", options=["SMA", "EMA", "WMA"])
-showDivergences = input.bool(true, "Highlight Divergences")
-pivotLookback   = input.int(5, "Divergence Pivot Lookback", minval=1)
+othersSymbol = input.string("CRYPTOCAP:OTHERS", "OTHERS Market Cap Symbol", tooltip="Market cap excluding top 10 coins")
+rsLength     = input.int(14, "RSI Length", minval=2)
+maLength     = input.int(14, "Signal MA Length", minval=1)
+maType       = input.string("SMA", "Signal MA Type", options=["SMA", "EMA"])
+obLevel      = input.float(70, "Overbought Level", minval=50, maxval=100)
+osLevel      = input.float(30, "Oversold Level", minval=0, maxval=50)
+
+// ─── Colors ───────────────────────────────────────────────────────────────────
+bullColor = input.color(#26a69a, "Bull Color")
+bearColor = input.color(#ef5350, "Bear Color")
+maColor   = input.color(#FF9800, "Signal MA Color")
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-altClose   = close
 othersClose = request.security(othersSymbol, timeframe.period, close)
 
-// ─── Relative Strength Ratio ──────────────────────────────────────────────────
-// RS Ratio = altcoin performance / OTHERS performance, normalized to 100 baseline
-altReturn    = altClose / altClose[rsLength] - 1
-othersReturn = othersClose / othersClose[rsLength] - 1
+// ─── Relative Strength RSI ────────────────────────────────────────────────────
+// Ratio of altcoin to OTHERS mcap — then apply RSI to that ratio
+// When the altcoin outperforms OTHERS, the ratio rises → RSI goes up
+// When the altcoin underperforms OTHERS, the ratio falls → RSI goes down
+ratio = close / othersClose
+rsRsi = ta.rsi(ratio, rsLength)
 
-// Raw ratio: altcoin price relative to OTHERS mcap (normalized)
-rawRatio   = altClose / othersClose
-ratioSma   = ta.sma(rawRatio, rsLength)
-rsRatio    = (rawRatio / ratioSma) * 100  // Normalized around 100
+// ─── Signal MA ────────────────────────────────────────────────────────────────
+signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
 
-// ─── RS Momentum (RSI of the ratio) ──────────────────────────────────────────
-rsMomentum = ta.rsi(rawRatio, rsiLength)
+// ─── Color Logic ──────────────────────────────────────────────────────────────
+// RSI line color: green when above signal MA (outperforming), red when below
+rsColor = rsRsi >= signalMa ? bullColor : bearColor
 
-// ─── Moving Average of RS Ratio ───────────────────────────────────────────────
-maValue = switch maType
-    "SMA" => ta.sma(rsRatio, maLength)
-    "EMA" => ta.ema(rsRatio, maLength)
-    "WMA" => ta.wma(rsRatio, maLength)
-
-// ─── Histogram (RS Ratio minus its MA) ────────────────────────────────────────
-histValue = rsRatio - maValue
-histColor = histValue >= 0 ? (histValue >= histValue[1] ? color.new(#26a69a, 0) : color.new(#26a69a, 60)) : (histValue <= histValue[1] ? color.new(#ef5350, 0) : color.new(#ef5350, 60))
-
-// ─── Divergence Detection ─────────────────────────────────────────────────────
-pivotHighPrice = ta.pivothigh(altClose, pivotLookback, pivotLookback)
-pivotLowPrice  = ta.pivotlow(altClose, pivotLookback, pivotLookback)
-pivotHighRs    = ta.pivothigh(rsRatio, pivotLookback, pivotLookback)
-pivotLowRs     = ta.pivotlow(rsRatio, pivotLookback, pivotLookback)
-
-// Bearish divergence: price makes higher high, RS makes lower high
-bearishDiv = showDivergences and not na(pivotHighPrice) and not na(pivotHighRs) and altClose[pivotLookback] > ta.valuewhen(not na(pivotHighPrice), altClose[pivotLookback], 1) and rsRatio[pivotLookback] < ta.valuewhen(not na(pivotHighRs), rsRatio[pivotLookback], 1)
-
-// Bullish divergence: price makes lower low, RS makes higher low
-bullishDiv = showDivergences and not na(pivotLowPrice) and not na(pivotLowRs) and altClose[pivotLookback] < ta.valuewhen(not na(pivotLowPrice), altClose[pivotLookback], 1) and rsRatio[pivotLookback] > ta.valuewhen(not na(pivotLowRs), rsRatio[pivotLookback], 1)
+// Fill color between RSI and signal: green/red with transparency
+fillColor = rsRsi >= signalMa ? color.new(bullColor, 85) : color.new(bearColor, 85)
 
 // ─── Plotting ─────────────────────────────────────────────────────────────────
+rsPlot = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
+maPlot = plot(signalMa, "Signal MA", color=maColor, linewidth=1)
+fill(rsPlot, maPlot, color=fillColor)
 
-// RS Ratio line
-plot(rsRatio, "RS Ratio", color=color.new(#2962FF, 0), linewidth=2)
-
-// Baseline at 100
-hline(100, "Baseline", color=color.gray, linestyle=hline.style_dashed)
-
-// Moving average
-plot(showMa ? maValue : na, "RS Ratio MA", color=color.new(#FF6D00, 0), linewidth=1)
-
-// Histogram
-plot(showHistogram ? histValue + 100 : na, "Histogram", color=histColor, style=plot.style_columns)
-
-// Divergence markers
-plotshape(bearishDiv ? rsRatio[pivotLookback] : na, "Bearish Divergence", shape.triangledown, location.absolute, color.new(#ef5350, 0), offset=-pivotLookback, size=size.small)
-plotshape(bullishDiv ? rsRatio[pivotLookback] : na, "Bullish Divergence", shape.triangleup, location.absolute, color.new(#26a69a, 0), offset=-pivotLookback, size=size.small)
-
-// ─── Background Zones ─────────────────────────────────────────────────────────
-bgcolor(rsRatio > 100 and rsMomentum > 50 ? color.new(#26a69a, 92) : na, title="Strong Outperformance")
-bgcolor(rsRatio < 100 and rsMomentum < 50 ? color.new(#ef5350, 92) : na, title="Strong Underperformance")
+// OB/OS levels
+h1 = hline(obLevel, "Overbought", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
+hline(50, "Midline", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
+h2 = hline(osLevel, "Oversold", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
+fill(h1, h2, color=color.new(color.gray, 95), title="OB/OS Background")
 
 // ─── Alerts ───────────────────────────────────────────────────────────────────
-alertcondition(ta.crossover(rsRatio, 100), "RS Cross Above 100", "{{ticker}} RS crossed above OTHERS baseline")
-alertcondition(ta.crossunder(rsRatio, 100), "RS Cross Below 100", "{{ticker}} RS crossed below OTHERS baseline")
-alertcondition(ta.crossover(rsRatio, maValue), "RS Cross Above MA", "{{ticker}} RS crossed above its MA")
-alertcondition(ta.crossunder(rsRatio, maValue), "RS Cross Below MA", "{{ticker}} RS crossed below its MA")
-alertcondition(bearishDiv, "Bearish RS Divergence", "{{ticker}} bearish divergence vs OTHERS")
-alertcondition(bullishDiv, "Bullish RS Divergence", "{{ticker}} bullish divergence vs OTHERS")
-
-// ─── Info Table ───────────────────────────────────────────────────────────────
-var table infoTable = table.new(position.top_right, 2, 4, bgcolor=color.new(#1e222d, 20), border_width=1)
-
-if barstate.islast
-    table.cell(infoTable, 0, 0, "RS Ratio", text_color=color.gray, text_size=size.small)
-    table.cell(infoTable, 1, 0, str.tostring(rsRatio, "#.##"), text_color=rsRatio > 100 ? color.green : color.red, text_size=size.small)
-    table.cell(infoTable, 0, 1, "RS Momentum", text_color=color.gray, text_size=size.small)
-    table.cell(infoTable, 1, 1, str.tostring(rsMomentum, "#.##"), text_color=rsMomentum > 50 ? color.green : color.red, text_size=size.small)
-    table.cell(infoTable, 0, 2, "vs OTHERS", text_color=color.gray, text_size=size.small)
-    table.cell(infoTable, 1, 2, rsRatio > 100 ? "Outperforming" : "Underperforming", text_color=rsRatio > 100 ? color.green : color.red, text_size=size.small)
-    table.cell(infoTable, 0, 3, "Trend", text_color=color.gray, text_size=size.small)
-    table.cell(infoTable, 1, 3, rsRatio > maValue ? "Improving" : "Weakening", text_color=rsRatio > maValue ? color.green : color.red, text_size=size.small)
+alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS entered overbought vs OTHERS")
+alertcondition(ta.crossunder(rsRsi, osLevel), "RS Oversold", "{{ticker}} Alt RS entered oversold vs OTHERS")
+alertcondition(ta.crossover(rsRsi, signalMa), "RS Cross Above Signal", "{{ticker}} Alt RS crossed above signal MA")
+alertcondition(ta.crossunder(rsRsi, signalMa), "RS Cross Below Signal", "{{ticker}} Alt RS crossed below signal MA")
+alertcondition(ta.crossover(rsRsi, 50), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline")
+alertcondition(ta.crossunder(rsRsi, 50), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline")
