@@ -16,42 +16,47 @@ osLevel      = input.float(30.0, "Oversold Level", minval=0.0, maxval=50.0)
 // ─── Colors ───────────────────────────────────────────────────────────────────
 bullColor = input.color(#26a69a, "Outperforming Color")
 bearColor = input.color(#ef5350, "Underperforming Color")
-maColor   = input.color(#FF9800, "Signal MA Color")
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 othersClose = request.security(othersSymbol, timeframe.period, close)
 
 // ─── Relative Strength RSI ────────────────────────────────────────────────────
-// Log ratio avoids floating point precision loss (altcoin price / billions mcap)
-// Above 50 = outperforming OTHERS, below 50 = underperforming
 logRatio = math.log(close) - math.log(othersClose)
 rawRsi   = ta.rsi(logRatio, rsLength)
-
-// Smooth the RSI to reduce whipsaw — cleaner signal
-rsRsi = ta.ema(rawRsi, smoothLen)
+rsRsi    = ta.ema(rawRsi, smoothLen)
 
 // ─── Signal MA ────────────────────────────────────────────────────────────────
 signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
 
 // ─── Color Logic ──────────────────────────────────────────────────────────────
-// Color based on position relative to 50 midline — clear outperform/underperform
-rsColor      = rsRsi >= 50.0 ? bullColor : bearColor
+isBull       = rsRsi >= 50.0
+rsColor      = isBull ? bullColor : bearColor
+maColor      = isBull ? color.new(bullColor, 40) : color.new(bearColor, 40)
 fillBullCol  = color.new(bullColor, 75)
 fillBearCol  = color.new(bearColor, 75)
 
+// ─── Background ───────────────────────────────────────────────────────────────
+// Subtle tinted background that shifts with the regime
+bgBull = color.new(bullColor, 94)
+bgBear = color.new(bearColor, 94)
+bgcolor(isBull ? bgBull : bgBear, title="Regime Background")
+
+// OB/OS zones get a stronger tint
+bgcolor(rsRsi >= obLevel ? color.new(bullColor, 85) : na, title="OB Zone Glow")
+bgcolor(rsRsi <= osLevel ? color.new(bearColor, 85) : na, title="OS Zone Glow")
+
 // ─── Plotting ─────────────────────────────────────────────────────────────────
-midPlot = plot(50.0, "Midline", color=color.new(color.white, 60), linewidth=1)
+midPlot = plot(50.0, "Midline", color=color.new(color.white, 70), linewidth=1, style=plot.style_line)
 rsPlot  = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
-plot(signalMa, "Signal MA", color=maColor, linewidth=1)
+maPlot  = plot(signalMa, "Signal MA", color=maColor, linewidth=2, style=plot.style_line)
 
 // Fill between RS line and midline — green above 50, red below 50
 fill(rsPlot, midPlot, rsRsi, 50.0, fillBullCol, color.new(color.gray, 100), title="Bull Fill")
 fill(rsPlot, midPlot, 50.0, rsRsi, color.new(color.gray, 100), fillBearCol, title="Bear Fill")
 
-// OB / OS
-h1 = hline(obLevel, "Overbought", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
-h2 = hline(osLevel, "Oversold", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
-fill(h1, h2, color=color.new(color.gray, 95), title="OB/OS Background")
+// OB / OS dashed lines — tinted to match
+hline(obLevel, "Overbought", color=color.new(#26a69a, 50), linestyle=hline.style_dashed)
+hline(osLevel, "Oversold", color=color.new(#ef5350, 50), linestyle=hline.style_dashed)
 
 // ─── Alerts ───────────────────────────────────────────────────────────────────
 alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS entered overbought vs OTHERS")
