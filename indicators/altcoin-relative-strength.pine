@@ -1,0 +1,57 @@
+//@version=6
+// This Pine Script™ source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © projectmoltino
+
+indicator("Altcoin Relative Strength vs OTHERS", shorttitle="Alt RS", overlay=false, precision=2)
+
+// ─── Inputs ───────────────────────────────────────────────────────────────────
+othersSymbol = input.string("CRYPTOCAP:OTHERS", "OTHERS Market Cap Symbol", tooltip="Market cap excluding top 10 coins")
+rsLength     = input.int(14, "RSI Length", minval=2)
+smoothLen    = input.int(5, "Smoothing Length", minval=1, tooltip="Smooths the RS line to reduce noise — higher = fewer whipsaws")
+maLength     = input.int(21, "Signal MA Length", minval=1)
+maType       = input.string("EMA", "Signal MA Type", options=["SMA", "EMA"])
+obLevel      = input.float(70.0, "Overbought Level", minval=50.0, maxval=100.0)
+osLevel      = input.float(30.0, "Oversold Level", minval=0.0, maxval=50.0)
+
+// ─── Colors ───────────────────────────────────────────────────────────────────
+bullColor = input.color(#26a69a, "Outperforming Color")
+bearColor = input.color(#ef5350, "Underperforming Color")
+maColor   = input.color(#FF9800, "Signal MA Color")
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+othersClose = request.security(othersSymbol, timeframe.period, close)
+
+// ─── Relative Strength RSI ────────────────────────────────────────────────────
+logRatio = math.log(close) - math.log(othersClose)
+rawRsi   = ta.rsi(logRatio, rsLength)
+rsRsi    = ta.ema(rawRsi, smoothLen)
+
+// ─── Signal MA ────────────────────────────────────────────────────────────────
+signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
+
+// ─── Color Logic ──────────────────────────────────────────────────────────────
+isBull      = rsRsi >= 50.0
+rsColor     = isBull ? bullColor : bearColor
+fillBullCol = color.new(bullColor, 75)
+fillBearCol = color.new(bearColor, 75)
+
+// ─── Plotting ─────────────────────────────────────────────────────────────────
+midPlot = plot(50.0, "Midline", color=color.new(color.white, 70), linewidth=1)
+rsPlot  = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
+plot(signalMa, "Signal MA", color=maColor, linewidth=2)
+
+// Fill between RS line and midline — green above 50, red below 50
+fill(rsPlot, midPlot, rsRsi, 50.0, fillBullCol, color.new(color.gray, 100), title="Bull Fill")
+fill(rsPlot, midPlot, 50.0, rsRsi, color.new(color.gray, 100), fillBearCol, title="Bear Fill")
+
+// OB / OS lines
+hline(obLevel, "Overbought", color=color.new(bullColor, 50), linestyle=hline.style_dashed)
+hline(osLevel, "Oversold", color=color.new(bearColor, 50), linestyle=hline.style_dashed)
+
+// ─── Alerts ───────────────────────────────────────────────────────────────────
+alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS entered overbought vs OTHERS")
+alertcondition(ta.crossunder(rsRsi, osLevel), "RS Oversold", "{{ticker}} Alt RS entered oversold vs OTHERS")
+alertcondition(ta.crossover(rsRsi, signalMa), "RS Cross Above Signal", "{{ticker}} Alt RS crossed above signal MA")
+alertcondition(ta.crossunder(rsRsi, signalMa), "RS Cross Below Signal", "{{ticker}} Alt RS crossed below signal MA")
+alertcondition(ta.crossover(rsRsi, 50.0), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline — outperforming")
+alertcondition(ta.crossunder(rsRsi, 50.0), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline — underperforming")
