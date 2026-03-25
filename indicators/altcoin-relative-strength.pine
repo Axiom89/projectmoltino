@@ -1,7 +1,7 @@
+//@version=6
 // This Pine Script™ source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 // © projectmoltino
 
-//@version=6
 indicator("Altcoin Relative Strength vs OTHERS", shorttitle="Alt RS", overlay=false, precision=2)
 
 // ─── Inputs ───────────────────────────────────────────────────────────────────
@@ -9,8 +9,8 @@ othersSymbol = input.string("CRYPTOCAP:OTHERS", "OTHERS Market Cap Symbol", tool
 rsLength     = input.int(14, "RSI Length", minval=2)
 maLength     = input.int(14, "Signal MA Length", minval=1)
 maType       = input.string("SMA", "Signal MA Type", options=["SMA", "EMA"])
-obLevel      = input.float(70, "Overbought Level", minval=50, maxval=100)
-osLevel      = input.float(30, "Oversold Level", minval=0, maxval=50)
+obLevel      = input.float(70.0, "Overbought Level", minval=50.0, maxval=100.0)
+osLevel      = input.float(30.0, "Oversold Level", minval=0.0, maxval=50.0)
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 bullColor = input.color(#26a69a, "Bull Color")
@@ -31,10 +31,7 @@ rsRsi = ta.rsi(ratio, rsLength)
 signalMa = maType == "EMA" ? ta.ema(rsRsi, maLength) : ta.sma(rsRsi, maLength)
 
 // ─── Color Logic ──────────────────────────────────────────────────────────────
-// RSI line color: green when above signal MA (outperforming), red when below
-rsColor = rsRsi >= signalMa ? bullColor : bearColor
-
-// Fill color between RSI and signal: green/red with transparency
+rsColor   = rsRsi >= signalMa ? bullColor : bearColor
 fillColor = rsRsi >= signalMa ? color.new(bullColor, 85) : color.new(bearColor, 85)
 
 // ─── Plotting ─────────────────────────────────────────────────────────────────
@@ -42,9 +39,8 @@ rsPlot = plot(rsRsi, "Alt RS", color=rsColor, linewidth=2)
 maPlot = plot(signalMa, "Signal MA", color=maColor, linewidth=1)
 fill(rsPlot, maPlot, color=fillColor)
 
-// OB/OS levels
 h1 = hline(obLevel, "Overbought", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
-hline(50, "Midline", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
+hline(50.0, "Midline", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
 h2 = hline(osLevel, "Oversold", color=color.new(color.gray, 60), linestyle=hline.style_dashed)
 fill(h1, h2, color=color.new(color.gray, 95), title="OB/OS Background")
 
@@ -53,5 +49,5 @@ alertcondition(ta.crossover(rsRsi, obLevel), "RS Overbought", "{{ticker}} Alt RS
 alertcondition(ta.crossunder(rsRsi, osLevel), "RS Oversold", "{{ticker}} Alt RS entered oversold vs OTHERS")
 alertcondition(ta.crossover(rsRsi, signalMa), "RS Cross Above Signal", "{{ticker}} Alt RS crossed above signal MA")
 alertcondition(ta.crossunder(rsRsi, signalMa), "RS Cross Below Signal", "{{ticker}} Alt RS crossed below signal MA")
-alertcondition(ta.crossover(rsRsi, 50), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline")
-alertcondition(ta.crossunder(rsRsi, 50), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline")
+alertcondition(ta.crossover(rsRsi, 50.0), "RS Cross Above 50", "{{ticker}} Alt RS crossed above midline")
+alertcondition(ta.crossunder(rsRsi, 50.0), "RS Cross Below 50", "{{ticker}} Alt RS crossed below midline")
