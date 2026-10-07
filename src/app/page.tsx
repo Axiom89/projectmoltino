@@ -9,7 +9,7 @@ const FAIR_X = "https://x.com/fair_vc";
 const EARLY_ACCESS = `mailto:${CONTACT}?subject=${encodeURIComponent("Moltino early access")}`;
 
 function Avatar({ size }: { size: number }) {
-  return <Image src="/mascot.png" alt="" width={size} height={size} className="avatar" style={{ width: size, height: size }} />;
+  return <Image src="/mascot.png" alt="" width={size} height={size} className="avatar" loading="eager" style={{ width: size, height: size }} />;
 }
 
 function TelegramIcon() {
@@ -195,7 +195,7 @@ function Away() {
         <div className="away">
           {AWAY.map((f) => (
             <div key={f.title} className="away-item">
-              <Image src={f.art} alt="" width={400} height={300} className="spot" />
+              <Image src={f.art} alt="" width={400} height={300} className="spot" loading="eager" />
               <h3 className="h3">{f.title}</h3>
               <p className="muted">{f.body}</p>
               <div className="from-moltino">
@@ -223,7 +223,7 @@ function Privacy() {
       <div className="wrap privacy-grid">
         <div className="privacy-side">
           <h2 className="h2" id="privacy-title">Privacy and safety</h2>
-          <Image src="/illustrations/vault.svg" alt="" width={400} height={360} className="vault" />
+          <Image src="/illustrations/vault.svg" alt="" width={400} height={360} className="vault" loading="eager" />
         </div>
         <div className="promises">
           {PROMISES.map((p) => (

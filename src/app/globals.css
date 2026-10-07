@@ -194,6 +194,8 @@
   @media (max-width: 720px) {
     .nav-links a:not(.btn) { display: none; }
     .promises { grid-template-columns: 1fr; }
+    .vault { max-width: 200px; }
+    .privacy-side { gap: 28px; }
     .section { padding: 80px 0; }
     .hero { padding-bottom: 72px; }
     .wrap { padding-inline: 16px; }
