@@ -25,6 +25,14 @@ function Check() {
   );
 }
 
+function Mark({ ok }: { ok: boolean }) {
+  return ok ? (
+    <svg className="ok" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" /></svg>
+  ) : (
+    <svg className="x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+  );
+}
+
 /* ───────────────────────────── Header ───────────────────────────── */
 function Header() {
   return (
@@ -35,7 +43,6 @@ function Header() {
           <a href="#what-it-does">What it does</a>
           <a href="#privacy">Privacy</a>
           <a href="#faq">FAQ</a>
-          <a href={EARLY_ACCESS} className="btn btn-ink btn-sm">Get early access</a>
         </nav>
       </div>
     </header>
@@ -63,7 +70,7 @@ function Phone() {
           </div>
           <div className="chat">
             <Msg d={0.3} className="bubble out">
-              anything I should know about $TIDE? <span className="mono">0x4f2a…b91c</span>
+              anything I should know about $TIDE? <span className="mono">0x4f2a...b91c</span>
               <span className="time">14:02</span>
             </Msg>
             <Msg d={1.1} className="bubble in">
@@ -71,9 +78,9 @@ function Phone() {
               <br />
               <span className="risk">high risk</span>
               <ul className="checks">
-                <li><span className="x">✕</span>deployer funded by a wallet tied to 3 earlier rugs</li>
-                <li><span className="x">✕</span>liquidity isn&apos;t locked</li>
-                <li><span className="ok">✓</span>contract has no mint or blacklist</li>
+                <li><Mark ok={false} />deployer funded by a wallet tied to 3 earlier rugs</li>
+                <li><Mark ok={false} />liquidity isn&apos;t locked</li>
+                <li><Mark ok />contract has no mint or blacklist</li>
               </ul>
               want me to keep an eye on it?
               <span className="time">14:02</span>
@@ -90,7 +97,7 @@ function Phone() {
             <Msg d={4.1} className="bubble in">
               <strong>heads up:</strong> the $TIDE deployer just sent 40% of supply to a fresh wallet.
               <br />
-              tx <span className="mono">0x9be1…07a2</span>
+              tx <span className="mono">0x9be1...07a2</span>
               <span className="time">17:48</span>
             </Msg>
           </div>
@@ -109,15 +116,15 @@ function Hero() {
     <section className="hero">
       <div className="wrap hero-grid">
         <div className="hero-copy">
-          <h1 className="h1">Your own onchain agent, on Telegram.</h1>
+          <h1 className="h1">Your own onchain assistant, on Telegram.</h1>
           <p className="lead">
-            Moltino watches your wallets and the tokens you care about, checks anything before you buy, and messages you when something changes. Just text it.
+            Paste a contract address and it tells you who deployed the token, who paid for the deploy and whether the liquidity is locked. Add your wallets and it messages you when something moves.
           </p>
           <div className="hero-ctas">
             <a href={EARLY_ACCESS} className="btn btn-ink">Get early access</a>
             <a href={BOT_URL} className="btn btn-line" target="_blank" rel="noopener noreferrer"><TelegramIcon />@moltino_bot</a>
           </div>
-          <p className="hero-note">Covers Base, Ethereum and Robinhood Chain. Early access opens soon; email us and you&apos;ll be among the first in.</p>
+          <p className="hero-note">Works on Base, Ethereum and Robinhood Chain.</p>
         </div>
         <Phone />
       </div>
@@ -143,8 +150,8 @@ function Asks() {
     <section className="section" aria-labelledby="asks-title">
       <div className="wrap">
         <div className="section-head">
-          <h2 className="h2" id="asks-title">Text it like a friend who reads chains.</h2>
-          <p className="muted">No dashboards and no commands to learn. Ask in plain words, the way you&apos;d ask the smartest person in your group chat.</p>
+          <h2 className="h2" id="asks-title">Ask in plain words.</h2>
+          <p className="muted">Moltino works out which checks to run.</p>
         </div>
         <div className="asks">
           {ASKS.map((a) => <span key={a} className="ask">{a}</span>)}
@@ -156,18 +163,18 @@ function Asks() {
 
 const AWAY = [
   {
-    title: "It watches",
-    body: "Add the wallets, tokens and devs you care about. Moltino keeps watching after you close Telegram.",
+    title: "Watches your wallets",
+    body: "Add wallets, tokens or a dev's address. Moltino keeps watching them after you close Telegram.",
     says: "your watchlist: 3 wallets, 5 tokens, 2 devs. all quiet so far.",
   },
   {
-    title: "It checks",
-    body: "Send any contract address on Base, Ethereum or Robinhood Chain and get a risk read with the evidence: who deployed it, who paid for it, liquidity, holders and socials.",
+    title: "Checks any token",
+    body: "Send a contract address on Base, Ethereum or Robinhood Chain. The read covers who deployed it, who paid for it, the liquidity, the holders and the socials, with the evidence attached.",
     says: "6 wallets sniped the first block and still hold 22% of supply.",
   },
   {
-    title: "It briefs you",
-    body: "A short morning note on your bags and the accounts you follow, so you can catch up without scrolling CT for an hour.",
+    title: "Morning brief",
+    body: "A short note each morning on your bags and the accounts you follow.",
     says: "gm. 2 of your tokens moved more than 20% overnight and one dev wallet sold. want details?",
   },
 ];
@@ -197,10 +204,10 @@ function Away() {
 }
 
 const PROMISES = [
-  { title: "It only reads.", body: "Moltino looks at public chain data and the wallets you add. It can't move your funds." },
-  { title: "It never asks for your keys.", body: "No seed phrase, no private key, ever. Anyone asking for one in Moltino's name is a scammer." },
-  { title: "It doesn't trade for you.", body: "It tells you what it found and shows the evidence. The decision stays yours." },
-  { title: "You decide what it remembers.", body: "Add or remove wallets whenever you like, and ask it to forget your watchlist at any time." },
+  { title: "Read-only", body: "It looks at public chain data and the wallets you add. It has no way to move funds or sign a transaction." },
+  { title: "Your keys stay with you", body: "Moltino never asks for a seed phrase or private key. Anyone who does in its name is a scammer." },
+  { title: "You make the calls", body: "It reports what it found and shows the evidence. Buying, selling or doing nothing is up to you." },
+  { title: "Forget on request", body: "Remove a wallet whenever you like, or ask it to forget your whole watchlist." },
 ];
 
 function Privacy() {
@@ -208,7 +215,7 @@ function Privacy() {
     <section className="section band" id="privacy" aria-labelledby="privacy-title">
       <div className="wrap">
         <div className="section-head">
-          <h2 className="h2" id="privacy-title">Your agent works for you, and only you.</h2>
+          <h2 className="h2" id="privacy-title">Privacy and safety</h2>
         </div>
         <div className="promises">
           {PROMISES.map((p) => (
@@ -227,10 +234,10 @@ function Privacy() {
 }
 
 const STEPS = [
-  { title: "You send a message", body: "A contract address, a wallet, or a plain question." },
-  { title: "An analyst agent researches it", body: "Onchain reads: deployer, funders, liquidity, holders, early buyers." },
-  { title: "A socials agent checks the people", body: "Who runs it, who is pushing it, and whether those accounts are real." },
-  { title: "A risk agent stress-tests the read", body: "It looks for what the others missed before anything reaches you." },
+  { title: "You send a message", body: "A contract address, a wallet or a question." },
+  { title: "The analyst agent researches it", body: "Deployer, funders, liquidity, holders and early buyers." },
+  { title: "The socials agent checks the people", body: "Who runs the project, who is pushing it, and whether those accounts are real." },
+  { title: "The risk agent stress-tests the read", body: "It looks for anything the first two missed." },
 ];
 
 function BuiltOnClaude() {
@@ -240,7 +247,7 @@ function BuiltOnClaude() {
         <div className="claude-copy">
           <h2 className="h2" id="claude-title">Built on Claude.</h2>
           <p>
-            Behind the chat, a small desk of Claude agents works every request. They run on Claude Code, share a written playbook of onchain checks, and review their own misses every week, so each read is a little sharper than the last.
+            Each request goes to a small desk of Claude agents running on Claude Code. They share a written playbook of onchain checks, go over their own misses every week and update the playbook.
           </p>
         </div>
         <ol className="steps">
@@ -252,7 +259,7 @@ function BuiltOnClaude() {
           ))}
           <li className="step last">
             <span className="num" aria-hidden="true"><TelegramIcon /></span>
-            <div><strong>Moltino replies</strong><span className="muted">A short read with the evidence attached, right in your chat.</span></div>
+            <div><strong>Moltino replies</strong><span className="muted">A short read in your chat, evidence attached.</span></div>
           </li>
         </ol>
       </div>
@@ -261,11 +268,11 @@ function BuiltOnClaude() {
 }
 
 const FAQ = [
-  { q: "Does Moltino trade for me?", a: "No. It reads chains and tells you what it found. It can't sign transactions or move funds." },
+  { q: "Does Moltino trade for me?", a: "No. It can't sign transactions or move funds." },
   { q: "Which chains does it cover?", a: "Base, Ethereum and Robinhood Chain." },
-  { q: "Is this financial advice?", a: "No. Moltino gives you research and risk reads with the evidence attached. What you do with them is your call." },
-  { q: "When can I use it?", a: `Early access opens soon. Email ${CONTACT} and you'll be among the first in.` },
-  { q: "Who's behind Moltino?", a: "Moltino is built by Gio, a builder in the Base ecosystem, on top of Claude by Anthropic." },
+  { q: "Is this financial advice?", a: "No. You get research and the evidence behind it. What you do with that is your call." },
+  { q: "When can I use it?", a: `Early access opens soon. Email ${CONTACT} to get on the list.` },
+  { q: "Who's behind Moltino?", a: "Moltino is built by Gio, a builder on Base, and runs on Claude by Anthropic." },
 ];
 
 function Faq() {
@@ -310,7 +317,7 @@ function Footer() {
             <a href={BOT_URL} target="_blank" rel="noopener noreferrer">Telegram</a>
             <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
           </div>
-          <p className="fine">© 2026 Moltino. Research, not financial advice.</p>
+          <p className="fine">© 2026 Moltino. Not financial advice.</p>
         </div>
       </div>
     </footer>

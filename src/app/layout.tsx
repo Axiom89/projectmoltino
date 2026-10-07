@@ -6,9 +6,9 @@ const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700",
 const body = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-body" });
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
 
-const title = "Moltino — your own onchain agent on Telegram";
+const title = "Moltino, your own onchain assistant on Telegram";
 const description =
-  "Moltino watches your wallets and the tokens you care about, checks anything before you buy, and messages you when something changes. Built on Claude.";
+  "Paste a contract address and Moltino tells you who deployed the token, who paid for the deploy and whether the liquidity is locked. It also watches your wallets and messages you when something moves. Built on Claude.";
 
 export const metadata: Metadata = {
   title,
