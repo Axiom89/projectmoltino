@@ -3,6 +3,9 @@ import type { CSSProperties, ReactNode } from "react";
 
 const BOT_URL = "https://t.me/moltino_bot";
 const CONTACT = "hello@moltino.xyz";
+const BUILDER_URL = "https://x.com/tyrealgg";
+const FAIR_URL = "https://fairfund.vc";
+const FAIR_X = "https://x.com/fair_vc";
 const EARLY_ACCESS = `mailto:${CONTACT}?subject=${encodeURIComponent("Moltino early access")}`;
 
 function Avatar({ size }: { size: number }) {
@@ -163,16 +166,19 @@ function Asks() {
 
 const AWAY = [
   {
+    art: "/illustrations/watch.svg",
     title: "Watches your wallets",
     body: "Add wallets, tokens or a dev's address. Moltino keeps watching them after you close Telegram.",
     says: "your watchlist: 3 wallets, 5 tokens, 2 devs. all quiet so far.",
   },
   {
+    art: "/illustrations/check.svg",
     title: "Checks any token",
     body: "Send a contract address on Base, Ethereum or Robinhood Chain. The read covers who deployed it, who paid for it, the liquidity, the holders and the socials, with the evidence attached.",
     says: "6 wallets sniped the first block and still hold 22% of supply.",
   },
   {
+    art: "/illustrations/brief.svg",
     title: "Morning brief",
     body: "A short note each morning on your bags and the accounts you follow.",
     says: "gm. 2 of your tokens moved more than 20% overnight and one dev wallet sold. want details?",
@@ -189,6 +195,7 @@ function Away() {
         <div className="away">
           {AWAY.map((f) => (
             <div key={f.title} className="away-item">
+              <Image src={f.art} alt="" width={400} height={300} className="spot" />
               <h3 className="h3">{f.title}</h3>
               <p className="muted">{f.body}</p>
               <div className="from-moltino">
@@ -213,9 +220,10 @@ const PROMISES = [
 function Privacy() {
   return (
     <section className="section band" id="privacy" aria-labelledby="privacy-title">
-      <div className="wrap">
-        <div className="section-head">
+      <div className="wrap privacy-grid">
+        <div className="privacy-side">
           <h2 className="h2" id="privacy-title">Privacy and safety</h2>
+          <Image src="/illustrations/vault.svg" alt="" width={400} height={360} className="vault" />
         </div>
         <div className="promises">
           {PROMISES.map((p) => (
@@ -267,12 +275,43 @@ function BuiltOnClaude() {
   );
 }
 
-const FAQ = [
-  { q: "Does Moltino trade for me?", a: "No. It can't sign transactions or move funds." },
-  { q: "Which chains does it cover?", a: "Base, Ethereum and Robinhood Chain." },
-  { q: "Is this financial advice?", a: "No. You get research and the evidence behind it. What you do with that is your call." },
-  { q: "When can I use it?", a: `Early access opens soon. Email ${CONTACT} to get on the list.` },
-  { q: "Who's behind Moltino?", a: "Moltino is built by Gio, a builder on Base, and runs on Claude by Anthropic." },
+const FAQ: { q: string; a: ReactNode }[] = [
+  {
+    q: "What does a read include?",
+    a: "Who deployed the token, which wallet paid for the deploy, and what those wallets launched before. Whether the liquidity is locked or burned, and who holds the LP tokens. How concentrated the holders are, how many wallets sniped the first blocks and whether they still hold. Contract flags such as a mint function, a blacklist or a sell tax. Then the people: the team's X and Telegram, and the accounts pushing the token.",
+  },
+  {
+    q: "What counts as evidence?",
+    a: "Transaction hashes, wallet addresses and explorer links. Every flag in a read points at the transaction or wallet behind it, so you can check it yourself.",
+  },
+  {
+    q: "How does Moltino decide something is a rug?",
+    a: "It needs evidence of extraction or abandonment: the deployer pulling liquidity, insiders selling supply they got for free, or a team that stops shipping and goes quiet. A price drop on its own doesn't count. When Moltino calls a rug, the read shows the transactions that prove it.",
+  },
+  {
+    q: "What happens when a check can't be resolved?",
+    a: "The read says so. If a funding trail runs into a bridge or an exchange, or a liquidity lock can't be verified onchain, Moltino marks that check as unresolved and tells you what's missing.",
+  },
+  {
+    q: "Does Moltino trade for me?",
+    a: "No. It reads public chain data and the wallets you add, and that's all it can do. It can't sign a transaction, approve a token or move funds, and it will never ask for a seed phrase or private key.",
+  },
+  {
+    q: "Which chains does it cover?",
+    a: "Base, Ethereum and Robinhood Chain. Wallet traces, liquidity checks and contract flags work the same way on all three.",
+  },
+  {
+    q: "Is this financial advice?",
+    a: "No. Moltino tells you what the chain shows about a token and the people behind it, with the evidence attached. It won't tell you to buy or sell. What you do with a read is your call.",
+  },
+  {
+    q: "When can I use it?",
+    a: <>Early access opens soon. Email <a href={EARLY_ACCESS}>{CONTACT}</a> and we&apos;ll add you to the list. You&apos;ll get access through <a href={BOT_URL} target="_blank" rel="noopener noreferrer">@moltino_bot</a> on Telegram.</>,
+  },
+  {
+    q: "Who's behind Moltino?",
+    a: <>Moltino is built by <a href={BUILDER_URL} target="_blank" rel="noopener noreferrer">@tyrealgg</a>, an experienced web3 trader. It runs on Claude by Anthropic, and <a href={FAIR_URL} target="_blank" rel="noopener noreferrer">FAIR</a>, an autonomous venture fund, is an official partner.</>,
+  },
 ];
 
 function Faq() {
@@ -289,6 +328,24 @@ function Faq() {
               <p>{f.a}</p>
             </details>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Partner() {
+  return (
+    <section className="wrap" aria-labelledby="partner-title">
+      <div className="partner">
+        <p className="partner-label" id="partner-title">Official partner</p>
+        <div className="partner-body">
+          <a href={FAIR_URL} target="_blank" rel="noopener noreferrer" className="partner-name">FAIR</a>
+          <p className="muted">An autonomous venture fund.</p>
+        </div>
+        <div className="partner-links">
+          <a href={FAIR_URL} target="_blank" rel="noopener noreferrer">fairfund.vc</a>
+          <a href={FAIR_X} target="_blank" rel="noopener noreferrer">@fair_vc</a>
         </div>
       </div>
     </section>
@@ -316,6 +373,7 @@ function Footer() {
           <div className="foot-links">
             <a href={BOT_URL} target="_blank" rel="noopener noreferrer">Telegram</a>
             <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+            <a href={BUILDER_URL} target="_blank" rel="noopener noreferrer">Built by @tyrealgg</a>
           </div>
           <p className="fine">© 2026 Moltino. Not financial advice.</p>
         </div>
@@ -334,6 +392,7 @@ export default function Home() {
         <Away />
         <Privacy />
         <BuiltOnClaude />
+        <Partner />
         <Faq />
         <Closer />
       </main>

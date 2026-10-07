@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <style>
+    :root { --ink:#172036; --yolk:#F6C744; --yolk-shade:#E2AE1C; --paper:#FFFFFF; --spiral:#3F55E0; --spiral-lt:#B9C2F7; --flag:#D0442C; }
+    .o { stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+  </style>
+
+  <!-- ping: something moved -->
+  <g id="ping">
+    <circle cx="300" cy="62" r="40" fill="none" stroke="var(--spiral)" stroke-width="5" opacity=".25"/>
+    <circle cx="300" cy="62" r="26" fill="none" stroke="var(--spiral)" stroke-width="5" opacity=".55"/>
+    <circle cx="300" cy="62" r="11" fill="var(--flag)" class="o" stroke-width="5"/>
+  </g>
+
+  <!-- hard offset shadow -->
+  <g id="shadow" fill="var(--ink)">
+    <rect x="78" y="118" width="244" height="150" rx="26"/>
+  </g>
+
+  <!-- card peeking out of the wallet -->
+  <g id="card">
+    <rect x="98" y="78" width="176" height="96" rx="14" fill="var(--paper)" class="o" transform="rotate(-8 186 126)"/>
+    <path d="M118 104 h70" class="o" fill="none" transform="rotate(-8 186 126)"/>
+    <path d="M118 124 h40" class="o" fill="none" transform="rotate(-8 186 126)"/>
+  </g>
+
+  <!-- wallet body -->
+  <g id="wallet">
+    <rect x="70" y="110" width="244" height="150" rx="26" fill="var(--yolk)" class="o"/>
+    <path d="M90 236 q0 10 10 10 h150" fill="none" stroke="var(--yolk-shade)" stroke-width="8" stroke-linecap="round"/>
+    <!-- clasp -->
+    <rect x="236" y="160" width="96" height="58" rx="16" fill="var(--paper)" class="o"/>
+    <circle cx="266" cy="189" r="11" fill="var(--spiral)" class="o" stroke-width="5"/>
+  </g>
+
+  <!-- snail eye stalks peeking over the wallet -->
+  <g id="eyes">
+    <path d="M128 112 q-6 -34 -18 -56" fill="none" stroke="var(--ink)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M128 112 q-6 -34 -18 -56" fill="none" stroke="var(--yolk)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M164 112 q2 -36 12 -60" fill="none" stroke="var(--ink)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M164 112 q2 -36 12 -60" fill="none" stroke="var(--yolk)" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="108" cy="50" r="20" fill="var(--ink)"/>
+    <circle cx="178" cy="46" r="20" fill="var(--ink)"/>
+    <circle cx="114" cy="50" r="9" fill="var(--spiral)"/>
+    <circle cx="184" cy="46" r="9" fill="var(--spiral)"/>
+    <circle cx="117" cy="45" r="4" fill="var(--paper)"/>
+    <circle cx="187" cy="41" r="4" fill="var(--paper)"/>
+  </g>
+</svg>

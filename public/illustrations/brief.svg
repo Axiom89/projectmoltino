@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <style>
+    :root { --ink:#172036; --yolk:#F6C744; --yolk-shade:#E2AE1C; --paper:#FFFFFF; --spiral:#3F55E0; --spiral-lt:#B9C2F7; --flag:#D0442C; --pass:#2D8A57; }
+    .o { stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+  </style>
+
+  <!-- rising sun -->
+  <g id="sun">
+    <g stroke="var(--yolk-shade)" stroke-width="8" stroke-linecap="round">
+      <path d="M200 22 v22"/><path d="M122 50 l14 16"/><path d="M278 50 l-14 16"/>
+      <path d="M78 110 l20 8"/><path d="M322 110 l-20 8"/>
+    </g>
+    <path d="M100 168 a100 100 0 0 1 200 0 z" fill="var(--yolk)" class="o"/>
+  </g>
+
+  <!-- hard offset shadow -->
+  <g id="shadow" fill="var(--ink)">
+    <rect x="94" y="132" width="196" height="146" rx="14"/>
+    <rect x="276" y="196" width="74" height="84" rx="12"/>
+  </g>
+
+  <!-- folded note with a sparkline -->
+  <g id="note">
+    <rect x="86" y="124" width="196" height="146" rx="14" fill="var(--paper)" class="o"/>
+    <path d="M106 150 h92" class="o" fill="none"/>
+    <path d="M106 170 h60" class="o" fill="none" stroke-width="5" opacity=".45"/>
+    <path d="M108 238 l30 -20 l24 12 l30 -34 l26 16 l26 -30" fill="none" stroke="var(--pass)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="244" cy="182" r="8" fill="var(--flag)" class="o" stroke-width="4"/>
+  </g>
+
+  <!-- coffee mug -->
+  <g id="mug">
+    <path d="M340 214 q24 0 24 22 q0 22 -24 22" fill="none" class="o" stroke-width="7"/>
+    <rect x="268" y="188" width="74" height="84" rx="12" fill="var(--spiral)" class="o"/>
+    <path d="M300 178 q-8 -12 0 -24 q8 -12 0 -24" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+    <path d="M326 178 q-8 -12 0 -24 q8 -12 0 -24" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+  </g>
+</svg>

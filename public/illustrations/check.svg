@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <style>
+    :root { --ink:#172036; --yolk:#F6C744; --yolk-shade:#E2AE1C; --paper:#FFFFFF; --spiral:#3F55E0; --spiral-lt:#B9C2F7; --flag:#D0442C; }
+    .o { stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+  </style>
+
+  <!-- hard offset shadows -->
+  <g id="shadow" fill="var(--ink)">
+    <circle cx="166" cy="168" r="96"/>
+    <circle cx="265" cy="195" r="58"/>
+  </g>
+
+  <!-- token coin -->
+  <g id="coin">
+    <circle cx="158" cy="160" r="96" fill="var(--yolk)" class="o"/>
+    <circle cx="158" cy="160" r="70" fill="none" stroke="var(--yolk-shade)" stroke-width="10"/>
+    <!-- spiral mark echoing the shell -->
+    <path d="M158 160 m0 -6 a6 6 0 1 1 -6 6 a14 14 0 0 1 14 -14 a22 22 0 0 1 22 22 a30 30 0 0 1 -30 30 a38 38 0 0 1 -38 -38"
+          fill="none" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- red flag pinned on the coin -->
+  <g id="flag">
+    <path d="M92 66 v70" class="o" fill="none"/>
+    <path d="M92 68 h52 l-12 16 l12 16 h-52 z" fill="var(--flag)" class="o"/>
+  </g>
+
+  <!-- magnifying glass -->
+  <g id="lens">
+    <path d="M296 226 l52 52" stroke="var(--ink)" stroke-width="26" stroke-linecap="round"/>
+    <path d="M296 226 l52 52" stroke="var(--spiral)" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="258" cy="188" r="58" fill="#E3E7FC" class="o"/>
+    <path d="M232 204 a30 30 0 0 0 50 8" fill="none" stroke="var(--spiral-lt)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M226 168 a36 36 0 0 1 26 -26" fill="none" stroke="var(--paper)" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>
