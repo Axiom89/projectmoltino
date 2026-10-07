@@ -1,47 +1,30 @@
 import type { Metadata } from "next";
+import { Bricolage_Grotesque, Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
+const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-display" });
+const body = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-body" });
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
+
+const title = "Moltino — your own onchain agent on Telegram";
+const description =
+  "Moltino watches your wallets and the tokens you care about, checks anything before you buy, and messages you when something changes. Built on Claude.";
+
 export const metadata: Metadata = {
-  title: "Moltino — Onchain Research Desk on Telegram",
-  description:
-    "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
-  openGraph: {
-    title: "Moltino — Onchain Research Desk on Telegram",
-    description:
-      "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
-    url: "https://moltino.xyz",
-    siteName: "Moltino",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Moltino — Onchain Research Desk on Telegram",
-    description:
-      "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
-  },
+  title,
+  description,
+  metadataBase: new URL("https://moltino.xyz"),
+  openGraph: { title, description, url: "https://moltino.xyz", siteName: "Moltino", type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className="antialiased">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
