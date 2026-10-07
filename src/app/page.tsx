@@ -154,50 +154,59 @@ function Divider() {
   return <div className="section-divider mx-auto max-w-4xl" />;
 }
 
+/* ───────────────────────────── Links ────────────────────────────────── */
+const BOT_URL = "https://t.me/moltino_bot";
+const CONTACT = "hello@moltino.xyz";
+
 /* ───────────────────────────── Icons ────────────────────────────────── */
-function ContractIcon() {
+function TraceIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="9" y1="13" x2="15" y2="13" />
-      <line x1="9" y1="17" x2="13" y2="17" />
+      <circle cx="6" cy="5" r="2.5" />
+      <circle cx="18" cy="12" r="2.5" />
+      <circle cx="6" cy="19" r="2.5" />
+      <path d="M8.5 5.5c4 .5 6 2.5 7.2 5" />
+      <path d="M8.5 18.5c4-.5 6-2.5 7.2-5" />
     </svg>
   );
 }
 
-function DappIcon() {
+function ShieldIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-      <path d="M7 8l3 3-3 3" />
-      <line x1="13" y1="14" x2="17" y2="14" />
+      <path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" />
+      <path d="M9 12l2 2 4-4" />
     </svg>
   );
 }
 
-function MarketingIcon() {
+function PeopleIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5" />
+      <path d="M16 4.5a3.5 3.5 0 010 7" />
+      <path d="M18 14.8c2 .7 3.2 2.5 3.5 5.2" />
     </svg>
   );
 }
 
-function SocialIcon() {
+function ScaleIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 2h4v4M21 2l-7.5 7.5M21 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6" />
+      <line x1="12" y1="3" x2="12" y2="21" />
+      <line x1="7" y1="21" x2="17" y2="21" />
+      <path d="M4 7h16" />
+      <path d="M4 7l-2.5 6a3 3 0 005 0z" />
+      <path d="M20 7l-2.5 6a3 3 0 005 0z" />
     </svg>
   );
 }
 
-function XIcon({ size = 16 }: { size?: number }) {
+function TelegramIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      <path d="M21.94 4.3a1 1 0 00-1.36-1.1L2.66 10.2a1 1 0 00.06 1.88l4.4 1.4 1.7 5.4a1 1 0 001.66.38l2.5-2.4 4.5 3.3a1 1 0 001.57-.6l2.9-15.26zM9.6 13.9l7.8-6.1-6.2 7.1-.3 3.1-1.3-4.1z" />
     </svg>
   );
 }
@@ -221,10 +230,10 @@ function Navbar() {
           </div>
           <span className="text-lg font-bold tracking-tight">moltino</span>
         </div>
-        <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
+        <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-white/5">
-          <XIcon />
-          Follow
+          <TelegramIcon />
+          Open in Telegram
         </a>
       </div>
     </nav>
@@ -267,7 +276,7 @@ function Hero() {
             <div className="relative z-10 animate-float">
               <Image
                 src="/mascot.png"
-                alt="Moltino Agent"
+                alt="Moltino"
                 width={180}
                 height={180}
                 priority
@@ -288,7 +297,7 @@ function Hero() {
         {/* Status badge */}
         <div className="animate-fade-in-up delay-100 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-electric-dim/30 bg-electric-dim/5 text-electric-bright text-sm font-medium mb-8 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-electric animate-pulse" />
-          Building in public
+          Early access opening soon
         </div>
 
         <h1 className="animate-fade-in-up delay-200 text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter leading-none mb-6">
@@ -296,21 +305,19 @@ function Hero() {
         </h1>
 
         <p className="animate-fade-in-up delay-300 text-xl sm:text-2xl text-text-secondary font-medium max-w-2xl mx-auto mb-4 leading-relaxed">
-          Your onchain EVM agent
+          Onchain research desk on Telegram
         </p>
 
         <p className="animate-fade-in-up delay-400 text-base text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-          Tell it what you need. It writes contracts, ships dApps, runs your socials, and handles Web3 marketing — just by talking to it.
+          Send it a token. Moltino traces the deployer and its funders, screens for rugs and farmed volume, checks the socials, and replies with a risk read and the evidence behind it.
         </p>
 
         {/* CTA buttons */}
         <div className="animate-fade-in-up delay-500 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
+          <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-electric-dim to-electric text-white font-semibold text-base transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_-8px_rgba(14,165,233,0.5)]">
-            Request Early Access
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-              <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
-            </svg>
+            <TelegramIcon size={18} />
+            Open @moltino_bot
           </a>
           <a href="#how-it-works"
             className="px-8 py-3.5 rounded-xl border border-border-subtle text-text-secondary font-medium text-base hover:text-text-primary hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
@@ -318,20 +325,21 @@ function Hero() {
           </a>
         </div>
 
-        {/* Terminal */}
+        {/* Example chat */}
         <div className="animate-fade-in-up delay-700 mt-16 max-w-lg mx-auto">
           <div className="border-glow rounded-xl bg-bg-secondary/70 backdrop-blur-md p-5 text-left font-mono text-sm">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-gold/60" />
               <div className="w-3 h-3 rounded-full bg-electric/60" />
-              <span className="ml-2 text-text-muted text-xs">moltino-agent</span>
+              <span className="ml-2 text-text-muted text-xs">@moltino_bot · example</span>
             </div>
             <div className="space-y-2 text-text-secondary">
-              <p><span className="text-electric">$</span> <span className="text-text-primary">@projectmoltino</span> audit my ERC-20 token contract</p>
-              <p className="text-electric-bright">→ Analyzing contract bytecode...</p>
-              <p className="text-electric-bright">→ 3 vulnerabilities found. Generating fix...</p>
-              <p className="text-gold">✓ Patched contract ready. Cost: 0.002 ETH</p>
+              <p><span className="text-electric">&gt;</span> <span className="text-text-primary">check 0x4f2…b91c on base</span></p>
+              <p className="text-electric-bright">→ Tracing deployer and funders...</p>
+              <p className="text-electric-bright">→ Reading LP custody, holders, early buyers...</p>
+              <p className="text-gold">⚠ Deployer funded by a wallet behind 3 earlier rugs</p>
+              <p className="text-gold">✓ Verdict: high risk, evidence attached</p>
               <p className="text-text-muted animate-pulse">█</p>
             </div>
           </div>
@@ -350,10 +358,10 @@ function Hero() {
 function WhatItDoes() {
   const ref = useReveal();
   const features = [
-    { icon: <ContractIcon />, title: "Write & Audit Contracts", description: "Spins up Solidity contracts, catches vulnerabilities before deployment, and patches what needs fixing. ERC-20s, DeFi protocols, whatever you're building.", tag: "Security" },
-    { icon: <DappIcon />, title: "Ship dApps From a DM", description: "Describe what you want in plain language. Moltino handles the architecture, the code, and the deployment. You just approve and ship.", tag: "Build" },
-    { icon: <MarketingIcon />, title: "Market to Onchain Audiences", description: "Get your product in front of the right people. Moltino builds narratives, creates content, and runs campaigns that resonate with crypto-native users.", tag: "Growth" },
-    { icon: <SocialIcon />, title: "Run Your Web3 Socials", description: "Keeps your project active across CT, Farcaster, and onchain social — consistent posting, engagement, community presence without the grind.", tag: "Social" },
+    { icon: <TraceIcon />, title: "Deployer & Funder Traces", description: "Follows the money behind a launch: who deployed it, who funded the deployer, and which earlier tokens the same wallets touched.", tag: "Onchain" },
+    { icon: <ShieldIcon />, title: "Rug & Farm Screens", description: "Checks liquidity custody, holder concentration, sniper and bundle activity, and wash-traded volume before you look twice.", tag: "Risk" },
+    { icon: <PeopleIcon />, title: "Socials Due Diligence", description: "Reads the team's X and Telegram footprint, who is pushing the token, and whether the accounts behind it are real.", tag: "Socials" },
+    { icon: <ScaleIcon />, title: "Stress-Tested Verdicts", description: "A separate risk agent challenges every read before it reaches you, so each verdict arrives with the reasons and the receipts.", tag: "Quant" },
   ];
 
   return (
@@ -361,8 +369,8 @@ function WhatItDoes() {
       <div ref={ref} className="max-w-6xl mx-auto opacity-0">
         <div className="text-center mb-16">
           <p className="text-electric text-sm font-semibold tracking-widest uppercase mb-3">What it does</p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">One agent, end-to-end</h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">From writing contracts to running your socials — Moltino handles the full stack so you can focus on the vision.</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">Due diligence in one message</h2>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">The checks a careful onchain researcher runs on a new token, done by agents in minutes. EVM chains, Base first.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((f, i) => (
@@ -390,10 +398,10 @@ function WhatItDoes() {
 function HowItWorks() {
   const ref = useReveal();
   const steps = [
-    { num: "01", title: "DM Moltino on X", description: "Send a message. Tell it what you need — a contract, a dApp, a marketing push, help with socials. No forms, no onboarding. Just talk.", accent: "from-electric-dim to-electric" },
-    { num: "02", title: "It scopes the work with you", description: "Moltino asks the right questions, figures out what you actually need, and gives you a cost estimate before anything starts.", accent: "from-electric to-purple" },
-    { num: "03", title: "Pay onchain via x402", description: "One upfront payment through x402 — a payment protocol made for agent transactions. Everything's onchain, verifiable, no middlemen.", accent: "from-purple to-gold" },
-    { num: "04", title: "Review it, ship it, or get a refund", description: "Moltino sends you a preview. If you like it, it goes live. If not, ask for a full refund. That simple.", accent: "from-gold to-gold-bright" },
+    { num: "01", title: "Send a token", description: "Paste a contract address or a $ticker into the Telegram chat. No dashboard, no signup form.", accent: "from-electric-dim to-electric" },
+    { num: "02", title: "The analyst agent researches it", description: "Onchain reads, holder and liquidity checks, and the launch history of every wallet involved.", accent: "from-electric to-purple" },
+    { num: "03", title: "The risk agent stress-tests it", description: "A second agent looks for what the first one missed and calibrates the verdict before anything is sent.", accent: "from-purple to-gold" },
+    { num: "04", title: "You get the read", description: "A short verdict with the evidence: wallets, links, and the checks that fired.", accent: "from-gold to-gold-bright" },
   ];
 
   return (
@@ -401,8 +409,8 @@ function HowItWorks() {
       <div ref={ref} className="relative max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-16">
           <p className="text-gold text-sm font-semibold tracking-widest uppercase mb-3">How it works</p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">DM to deploy</h2>
-          <p className="text-text-secondary text-lg max-w-xl mx-auto">Four steps. No dashboards, no signups, no waitlists.</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">DM to verdict</h2>
+          <p className="text-text-secondary text-lg max-w-xl mx-auto">Four steps, one chat.</p>
         </div>
         <div className="relative">
           <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-electric-dim via-purple to-gold opacity-20 hidden md:block" />
@@ -430,10 +438,15 @@ function HowItWorks() {
 function TechStack() {
   const ref = useReveal();
   const badges = [
-    { name: "Openclaw", description: "Agent framework" },
-    { name: "Base", description: "L2 chain registry" },
-    { name: "ERC-8004", description: "Onchain agent identity" },
-    { name: "x402", description: "Agent payment protocol" },
+    { name: "Claude Code", description: "Agent runtime" },
+    { name: "Claude Opus", description: "Reasoning model" },
+    { name: "Telegram", description: "Interface" },
+    { name: "Base", description: "Primary chain" },
+  ];
+  const agents = [
+    { role: "Analyst", job: "Finds and researches tokens" },
+    { role: "Risk & Quant", job: "Stress-tests every read" },
+    { role: "Socials", job: "Checks people and accounts" },
   ];
 
   return (
@@ -441,9 +454,9 @@ function TechStack() {
       <div ref={ref} className="max-w-4xl mx-auto opacity-0">
         <div className="text-center mb-12">
           <p className="text-purple text-sm font-semibold tracking-widest uppercase mb-3">Under the hood</p>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">Onchain-native stack</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">Built on Claude</h2>
           <p className="text-text-secondary text-lg max-w-xl mx-auto">
-            Registered on Base as an <span className="text-electric-bright font-medium">ERC-8004</span> agent. Reputation is onchain — fully transparent, fully verifiable.
+            Three <span className="text-electric-bright font-medium">Claude</span> agents run the desk around the clock on Claude Code. They share skills, onchain tools and a written knowledge base that gets sharper after every weekly review.
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4">
@@ -460,7 +473,7 @@ function TechStack() {
           ))}
         </div>
 
-        {/* Agent ID card */}
+        {/* Desk card */}
         <div className="mt-12 max-w-md mx-auto border-glow rounded-2xl bg-bg-card/40 backdrop-blur-sm p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="relative w-[44px] h-[44px]">
@@ -472,21 +485,20 @@ function TechStack() {
                   WebkitMaskImage: "radial-gradient(circle, black 36%, transparent 68%)",
                 }}
               />
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-electric border-2 border-bg-card animate-pulse" />
             </div>
             <div>
-              <p className="text-text-primary font-semibold text-sm">moltino.eth</p>
-              <p className="text-text-muted text-xs font-mono">ERC-8004 Registered Agent</p>
+              <p className="text-text-primary font-semibold text-sm">moltino desk</p>
+              <p className="text-text-muted text-xs font-mono">3 agents · Claude Code</p>
             </div>
-            <div className="ml-auto flex items-center gap-1.5 text-electric text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-electric animate-pulse" />
-              Active
+            <div className="ml-auto flex items-center gap-1.5 text-gold text-xs font-medium">
+              <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+              Early access soon
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div><p className="text-text-muted text-xs mb-1">Network</p><p className="text-text-primary text-sm font-medium">Base</p></div>
-            <div><p className="text-text-muted text-xs mb-1">Standard</p><p className="text-text-primary text-sm font-medium">ERC-8004</p></div>
-            <div><p className="text-text-muted text-xs mb-1">Status</p><p className="text-electric text-sm font-medium">Verified</p></div>
+            {agents.map((a, i) => (
+              <div key={i}><p className="text-text-primary text-sm font-medium mb-1">{a.role}</p><p className="text-text-muted text-xs">{a.job}</p></div>
+            ))}
           </div>
         </div>
       </div>
@@ -500,16 +512,22 @@ function Footer() {
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h3 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Made for the <span className="text-gradient">onchain future</span>
+            Due diligence, <span className="text-gradient">on demand</span>
           </h3>
           <p className="text-text-secondary text-lg max-w-lg mx-auto mb-8">
-            Agents that ship real work, get paid onchain, and build reputation over time. That's the bet.
+            Early access is opening soon. Open the bot to be first in, or write to us.
           </p>
-          <a href="https://x.com/projectmoltino" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
-            <XIcon size={18} />
-            Follow @projectmoltino
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-border-subtle text-text-primary font-medium hover:bg-white/10 hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
+              <TelegramIcon size={18} />
+              @moltino_bot
+            </a>
+            <a href={`mailto:${CONTACT}`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border-subtle text-text-secondary font-medium hover:text-text-primary hover:border-text-muted transition-all duration-300 backdrop-blur-sm">
+              {CONTACT}
+            </a>
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border-subtle/30">
           <div className="flex items-center gap-2.5">
@@ -523,9 +541,9 @@ function Footer() {
                 }}
               />
             </div>
-            <span className="text-text-muted text-sm">moltino.xyz</span>
+            <span className="text-text-muted text-sm">moltino.xyz · built by Gio · <a href="https://github.com/Axiom89" target="_blank" rel="noopener noreferrer" className="hover:text-text-primary transition-colors">GitHub</a></span>
           </div>
-          <p className="text-text-muted text-sm font-mono">agents &gt; dashboards</p>
+          <p className="text-text-muted text-sm font-mono">research, not financial advice</p>
         </div>
       </div>
     </footer>

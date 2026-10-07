@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Moltino — Your Onchain EVM Agent",
+  title: "Moltino — Onchain Research Desk on Telegram",
   description:
-    "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
+    "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
   openGraph: {
-    title: "Moltino — Your Onchain EVM Agent",
+    title: "Moltino — Onchain Research Desk on Telegram",
     description:
-      "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
+      "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
     url: "https://moltino.xyz",
     siteName: "Moltino",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Moltino — Your Onchain EVM Agent",
+    title: "Moltino — Onchain Research Desk on Telegram",
     description:
-      "DM it what you need. Moltino writes contracts, ships dApps, runs your socials, and handles Web3 marketing.",
+      "Send a token, get a risk read. Deployer and funder traces, rug and farm screens, socials due diligence. Built on Claude.",
   },
 };
 
